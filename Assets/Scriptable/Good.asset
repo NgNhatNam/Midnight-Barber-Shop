@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 36eec5c5ef204434d8140a208253d2a4, type: 3}
+  m_Name: Good
+  m_EditorClassIdentifier: Assembly-CSharp::HairData
+  styleName: Good
+  hairSprites:
+  - {fileID: 21300000, guid: 2c451e5646ceca348a260f928b8c8fe6, type: 3}
+  - {fileID: 21300000, guid: c8e6bd8f1a039344d93c395521989481, type: 3}
+  - {fileID: 21300000, guid: 424a3091525f06746870b51f69271e9b, type: 3}
