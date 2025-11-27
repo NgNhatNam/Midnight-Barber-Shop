@@ -490,10 +490,11 @@ public class CustomerManager : MonoBehaviour
         else
         {
             daySummaryPanel.SetActive(true);
+            Time.timeScale = 0f;
 
         }
 
-        Time.timeScale = 0f;
+        
 
         //daySummaryPanel.SetActive(true);
         playerController.enabled = true;
