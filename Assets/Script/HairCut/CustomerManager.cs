@@ -46,7 +46,7 @@ public class CustomerManager : MonoBehaviour
     public TMP_Text hairResultText;
 
     [Header("System Settings")]
-    public float bossThreshold = 0f; // stress < 20 => gặp Boss
+    public float bossThreshold = 0f; 
     public float soulChance = 0.30f;
 
     [Header("Haircut")]
@@ -520,7 +520,7 @@ public class CustomerManager : MonoBehaviour
         else
         {
             health.Damage(10);
-
+            health.DecreaseStress(10);
         }
     }
 }
