@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a85f33e7c008ee549b980456266d92b8, type: 3}
+  m_Name: SaMom
+  m_EditorClassIdentifier: Assembly-CSharp::NPCDialogie
+  npcName: "H\u01B0\u01A1ng"
+  npcPortrait: {fileID: -888757864372014434, guid: bb1fd209cbeefb24ca8e0a31835458f7, type: 3}
+  dialogueLines:
+  - "Ch\xE0o ch\xE1u"
+  - "C\xF4 l\xE0 H\u01B0\u01A1ng, m\u1EB9 c\u1EE7a Sa "
+  - "Ch\xE1u l\xE0m g\xEC \u1EDF \u0111\xE2y"
+  autoProgressLines: 010000
+  autoPorgressDelay: 1.5
+  typingSpeed: 0.05
+  voidSound: {fileID: 8300000, guid: 70e42e5223f073443ad04edd67f46ceb, type: 3}
+  voicePitch: 1

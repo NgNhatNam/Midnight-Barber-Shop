@@ -1,25 +1,66 @@
 ﻿using NUnit.Framework;
+using System;
 using System.Collections.Generic;
+using Unity.VisualScripting.Antlr3.Runtime.Misc;
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
 
 public class InventoryController : MonoBehaviour
 {
+    public static InventoryController Instance { get; private set; }
+
     private ItemDictionary itemDictionary;
 
-    public GameObject inventoryPanel; // Panel Ui chứa slot
+    public GameObject toolbarPanel; 
+    public GameObject inventoryPanel;
     public GameObject slotPrefab;       
-    public int slotCount;               
-    public GameObject[] itemPrefabs;  // Danh sách chứa item sẽ spawn vào các slot
+    public int slotCount;           
+    
+    Dictionary<int, int> itemsCountCache = new();
+    public event Action OnInventoryChanged; 
+
+    private void Awake()
+    {
+        if (Instance == null)
+        {
+            Instance = this;
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+    }
 
     void Start()
     {
         itemDictionary = FindAnyObjectByType<ItemDictionary>();
+        itemDictionary = ItemDictionary.Instance;
+        RebuildItemCounts();
 
     }
-
+    /*
     public bool AddItem(GameObject itemPrefab)
     {
+        Item itemToAdd = itemPrefab.GetComponent<Item>();
+        if (itemToAdd == null) return false;
+
+        //Check if we have this item type in inventory
+        foreach (Transform slotTranform in inventoryPanel.transform)
+        {
+            Slot slot = slotTranform.GetComponent<Slot>();
+            if (slot != null && slot.currentItem != null)
+            {
+                Item existingItem = slot.currentItem.GetComponent<Item>();
+                if (existingItem != null && existingItem.ID == itemToAdd.ID)
+                {
+                    
+                        // Same item, stack them
+                        existingItem.AddToStack(itemToAdd.quantity);
+                        return true;
+                }
+            }
+        }
+
         //Look for empty slot
         foreach (Transform slotTranform in inventoryPanel.transform) 
         { 
@@ -37,6 +78,131 @@ public class InventoryController : MonoBehaviour
         return false;
     }
 
+
+        public bool AddItem(GameObject itemPrefab)
+    {
+        Item itemToAdd = itemPrefab.GetComponent<Item>();
+        if (itemToAdd == null) return false;
+
+        // Lấy số lượng thực tế của item muốn thêm (ví dụ item dưới đất có quantity = 2)
+        int amountToAdd = itemToAdd.quantity;
+
+        // 1. Tìm xem trong Inventory đã có Item này chưa để Stack
+        foreach (Transform slotTransform in inventoryPanel.transform)
+        {
+            Slot slot = slotTransform.GetComponent<Slot>();
+
+            if (slot != null && slot.currentItem != null)
+            {
+                Item existingItem = slot.currentItem.GetComponent<Item>();
+
+                if (existingItem != null && existingItem.ID == itemToAdd.ID)
+                {
+                    // TĂNG SỐ LƯỢNG (Dùng số lượng thực tế của item nhặt được)
+                    existingItem.AddToStack(amountToAdd);
+
+                    // Nếu đây là item nhặt từ đất, hãy Destroy nó đi
+                    // Destroy(itemPrefab); 
+                    return true;
+                }
+            }
+        }
+
+        // 2. Nếu không stack được, tìm ô trống (Sửa logic của bạn một chút)
+        foreach (Transform slotTransform in inventoryPanel.transform)
+        {
+            Slot slot = slotTransform.GetComponent<Slot>();
+            if (slot != null && slot.currentItem == null)
+            {
+                GameObject newItem = Instantiate(itemPrefab, slot.transform);
+                newItem.GetComponent<RectTransform>().anchoredPosition = Vector2.zero;
+                slot.currentItem = newItem;
+
+                // QUAN TRỌNG: Đảm bảo item mới sinh ra có số lượng bằng item gốc
+                Item newItemComponent = newItem.GetComponent<Item>();
+                newItemComponent.quantity = amountToAdd;
+                newItemComponent.UpdateQuantityDisplay();
+
+                return true;
+            }
+        }
+        return false;
+    }
+    */
+
+    public void RebuildItemCounts()
+    {
+        itemsCountCache.Clear();
+
+        foreach (Transform slotTransform in inventoryPanel.transform)
+        {
+            Slot slot = slotTransform.GetComponent<Slot>();
+            if(slot.currentItem != null)
+            {
+                Item item = slot.currentItem.GetComponent<Item>();
+                if(item != null)
+                {
+                    itemsCountCache[item.ID] = itemsCountCache.GetValueOrDefault(item.ID, 0) + item.quantity;
+                }
+            }
+        }
+        OnInventoryChanged?.Invoke();
+    }
+
+    public Dictionary<int, int> GetItemCounts() => itemsCountCache;
+
+    public bool AddItem(GameObject itemObj)
+    {
+        Item itemToAdd = itemObj.GetComponent<Item>();
+        if (itemToAdd == null) return false;
+
+        int amountToAdd = itemToAdd.quantity;
+
+        // 1. Tìm để Stack
+        foreach (Transform slotTransform in inventoryPanel.transform)
+        {
+            Slot slot = slotTransform.GetComponent<Slot>();
+            if (slot != null && slot.currentItem != null)
+            {
+                Item existingItem = slot.currentItem.GetComponent<Item>();
+                if (existingItem != null && existingItem.ID == itemToAdd.ID)
+                {
+                    existingItem.AddToStack(amountToAdd);
+                    Destroy(itemObj);
+                    RebuildItemCounts();
+                    return true;
+                }
+            }
+        }
+
+        // 2. Tìm ô trống và TỰ ĐỘNG lấy Prefab chuẩn từ Dictionary
+        foreach (Transform slotTransform in inventoryPanel.transform)
+        {
+            Slot slot = slotTransform.GetComponent<Slot>();
+            if (slot != null && slot.currentItem == null)
+            {
+                // TỰ ĐỘNG NHẬN DIỆN PREFAB DỰA TRÊN ID CỦA VẬT PHẨM ĐANG NHẶT
+                GameObject correctPrefab = itemDictionary.GetItemPrefab(itemToAdd.ID);
+
+                if (correctPrefab != null)
+                {
+                    GameObject newItem = Instantiate(correctPrefab, slot.transform);
+                    newItem.GetComponent<RectTransform>().anchoredPosition = Vector2.zero;
+                    slot.currentItem = newItem;
+                   
+                    Item newItemComponent = newItem.GetComponent<Item>();
+                    newItemComponent.quantity = amountToAdd;
+                    newItemComponent.UpdateQuantityDisplay();
+
+                    Destroy(itemObj);
+                    RebuildItemCounts();
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
     public List<InventorySaveData> GetInventoryItems()
     {
         List<InventorySaveData> invData = new List<InventorySaveData>();
@@ -46,7 +212,11 @@ public class InventoryController : MonoBehaviour
             if (slot.currentItem != null)
             {
                 Item item = slot.currentItem.GetComponent<Item>();
-                invData.Add(new InventorySaveData { itemID = item.ID, slotIndex = slotTransform.GetSiblingIndex() });
+                invData.Add(new InventorySaveData { 
+                    itemID = item.ID, 
+                    slotIndex = slotTransform.GetSiblingIndex(), 
+                    quantity = item.quantity 
+                });
             }
         }
         return invData;
@@ -77,11 +247,21 @@ public class InventoryController : MonoBehaviour
                 {
                     GameObject item = Instantiate(itemPrefab, slot.transform);
                     item.GetComponent<RectTransform>().anchoredPosition = Vector2.zero;
+
+                    Item itemComponent = item.GetComponent<Item>();
+                    if (itemComponent != null && data.quantity > 1)
+                    {
+                        itemComponent.quantity = data.quantity;
+                        itemComponent.UpdateQuantityDisplay();
+                    }
+
                     slot.currentItem = item;
                 }
             }
 
         }
+
+        RebuildItemCounts();
     }
 
     public void SetLoadInventoryItems(List<InventorySaveData> inventorySaveData)
@@ -106,6 +286,14 @@ public class InventoryController : MonoBehaviour
                 {
                     GameObject item = Instantiate(itemPrefab, slot.transform);
                     item.GetComponent<RectTransform>().anchoredPosition = Vector2.zero;
+
+                    Item itemComponent = item.GetComponent<Item>();
+                    if (itemComponent != null && data.quantity > 1)
+                    {
+                        itemComponent.quantity = data.quantity;
+                        itemComponent.UpdateQuantityDisplay();
+                    }
+
                     slot.currentItem = item;
                 }
             }
@@ -113,6 +301,74 @@ public class InventoryController : MonoBehaviour
         }
     }
 
+    //=================================================================================
+
+    // Hàm bổ trợ để quét bất kỳ Panel nào 
+    public List<InventorySaveData> GetItemsFromPanel(GameObject panel)
+    {
+        List<InventorySaveData> data = new List<InventorySaveData>();
+        if (panel == null) return data;
+
+        foreach (Transform slotTransform in panel.transform)
+        {
+            Slot slot = slotTransform.GetComponent<Slot>();
+            if (slot != null && slot.currentItem != null)
+            {
+                Item item = slot.currentItem.GetComponent<Item>();
+                data.Add(new InventorySaveData
+                {
+                    itemID = item.ID,
+                    slotIndex = slotTransform.GetSiblingIndex(),
+                    quantity = item.quantity
+                });
+            }
+        }
+        return data;
+    }
+
+    // Hàm Load cho Toolbar
+    public void SetToolbarItems(List<InventorySaveData> data)
+    {
+        PopulatePanel(toolbarPanel, data);
+    }
+
+    // Hàm bổ trợ để đổ dữ liệu vào Panel
+    private void PopulatePanel(GameObject panel, List<InventorySaveData> data)
+    {
+        if (panel == null || data == null) return;
+
+        // Xóa item cũ trong các slot hiện có (không xóa bản thân Slot)
+        foreach (Transform slotTransform in panel.transform)
+        {
+            Slot slot = slotTransform.GetComponent<Slot>();
+            if (slot != null && slot.transform.childCount > 0)
+            {
+                foreach (Transform child in slot.transform) Destroy(child.gameObject);
+                slot.currentItem = null;
+            }
+        }
+
+        // Spawn item mới
+        foreach (var itemData in data)
+        {
+            if (itemData.slotIndex < panel.transform.childCount)
+            {
+                Slot slot = panel.transform.GetChild(itemData.slotIndex).GetComponent<Slot>();
+                GameObject prefab = itemDictionary.GetItemPrefab(itemData.itemID);
+                if (prefab != null)
+                {
+                    GameObject newItem = Instantiate(prefab, slot.transform);
+                    newItem.GetComponent<RectTransform>().anchoredPosition = Vector2.zero;
+                    Item itemComp = newItem.GetComponent<Item>();
+                    itemComp.quantity = itemData.quantity;
+                    itemComp.UpdateQuantityDisplay();
+                    slot.currentItem = newItem;
+                }
+            }
+        }
+    }
+
+    //=================================================================================
     public void ClearInventory()
     {
         // Xoá toàn bộ item và slot cũ
@@ -129,4 +385,70 @@ public class InventoryController : MonoBehaviour
 
         Debug.Log("Inventory has been cleared!");
     }
+
+    public void RemoveItemsFromInventory(int itemID, int amountToRemove)
+    {
+        // Tạo một danh sách các Panel cần quét để xóa đồ
+        List<GameObject> panelsToSearch = new List<GameObject> { inventoryPanel, toolbarPanel };
+
+        foreach (GameObject panel in panelsToSearch)
+        {
+            if (panel == null) continue;
+
+            foreach (Transform slotTransform in panel.transform)
+            {
+                if (amountToRemove <= 0) break;
+
+                Slot slot = slotTransform.GetComponent<Slot>();
+                if (slot != null && slot.currentItem != null)
+                {
+                    Item item = slot.currentItem.GetComponent<Item>();
+                    if (item != null && item.ID == itemID)
+                    {
+                        // Tính số lượng thực tế có thể trừ trong slot này
+                        int canRemove = Mathf.Min(amountToRemove, item.quantity);
+
+                        // Gọi hàm trừ stack (đảm bảo hàm này trừ số lượng và update UI của Item đó)
+                        item.RemoveFromStack(canRemove);
+                        amountToRemove -= canRemove;
+
+                        // Nếu slot đó hết sạch đồ thì xóa Object
+                        if (item.quantity <= 0)
+                        {
+                            Destroy(slot.currentItem);
+                            slot.currentItem = null;
+                        }
+                    }
+                }
+            }
+        }
+
+        // Cập nhật lại Cache số lượng để QuestController nhận dữ liệu mới
+        RebuildItemCounts();
+    }
+    
+    /*
+    public void RemoveItemsFromInventory(int itemID, int amountToRemove)
+    {
+        foreach (Transform slotTranform in inventoryPanel.transform)
+        {
+            if (amountToRemove <= 0) break;
+
+            Slot slot = slotTranform.GetComponent<Slot>();
+            if (slot?.currentItem?.GetComponent<Item>() is Item item && item.ID == itemID)
+            {
+                int removed = Mathf.Min(amountToRemove, item.quantity);
+                item.RemoveFromStack(removed);
+                amountToRemove -= removed;
+
+                if (item.quantity == 0)
+                {
+                    Destroy(slot.currentItem);
+                    slot.currentItem = null;
+                }
+            }
+        }
+
+        RebuildItemCounts();
+    }*/
 }

@@ -117,6 +117,9 @@ namespace DPUtils.System.DateTime
         public int CurrentWeek   => totalNumWeeks % 16 == 0 ? 16 : totalNumWeeks % 16 ;
         #endregion
 
+        public long TotalNumHours => (totalNumDays * 24) + hour;
+
+
         #region Constructors
 
         public DateTime(int date, int season, int year, int hour, int minutes)
@@ -257,7 +260,12 @@ namespace DPUtils.System.DateTime
 
         public bool TimeToOpen()
         {
-            return hour >= 21 || hour < 6;
+            return hour >= 0;
+        }
+
+        public bool TimeToAllShopOpen()
+        {
+            return hour >= 6 && hour <= 18;
         }
 
         public bool SoulTime()

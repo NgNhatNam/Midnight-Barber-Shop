@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a85f33e7c008ee549b980456266d92b8, type: 3}
+  m_Name: Sa
+  m_EditorClassIdentifier: Assembly-CSharp::NPCDialogie
+  npcName: Sa
+  npcPortrait: {fileID: 21300000, guid: e226a46eb7110304890cd1944b53a5e1, type: 3}
+  dialogueLines:
+  - "Ch\xE0o Nam"
+  - "H\xF4m nay tr\u1EDDi \u0111\u1EB9p ha"
+  - "T\u1EDB \u0111i nha"
+  autoProgressLines: 010000
+  autoPorgressDelay: 1.5
+  typingSpeed: 0.05
+  voidSound: {fileID: 8300000, guid: 70e42e5223f073443ad04edd67f46ceb, type: 3}
+  voicePitch: 1

@@ -1,3 +1,4 @@
+﻿using TMPro;
 using UnityEngine;
 
 public class ItemUI : MonoBehaviour
@@ -6,7 +7,7 @@ public class ItemUI : MonoBehaviour
 
     public GameObject TabUi;
     public GameObject panel;
-    private ItemDragHandler currentItem;
+    private Item currentItem;
 
     private void Awake()
     {
@@ -16,19 +17,22 @@ public class ItemUI : MonoBehaviour
 
     private void Update()
     {
+        /*
         if (!TabUi.activeSelf)
         {
             Hide();
-        }
+        }*/
     }
 
-    public void Show(ItemDragHandler item, Vector2 position)
+    public void Show(Item item, Vector2 position)
     {
         currentItem = item;
         panel.SetActive(true);
-        panel.transform.position = position;
-    }
 
+        // Nếu là Mobile, cho panel hiện cao lên 100 pixel để ngón tay không che mất
+        Vector2 offset = new Vector2(0, 150f);
+        panel.transform.position = position + offset;
+    }
     public void Hide()
     {
         panel.SetActive(false);
@@ -50,4 +54,19 @@ public class ItemUI : MonoBehaviour
 
         Hide();
     }
+
+    public void OnSplitButtonClicked()
+    {
+        if (currentItem != null && currentItem.quantity > 1)
+        {
+            // Gọi hàm SplitStack từ ItemDragHandler hoặc logic tách của bạn
+            ItemDragHandler dragHandler = currentItem.GetComponent<ItemDragHandler>();
+            if (dragHandler != null)
+            {
+                dragHandler.SplitStack();
+            }
+            Hide(); // Đóng menu sau khi tách
+        }
+    }
+
 }

@@ -7,8 +7,8 @@ public class Trap : MonoBehaviour
         if (collision.TryGetComponent<Health>(out var health))
         {
             health.SpendGold(1000);
-            health.DecreaseStress(10);
-            health.Damage(10);
+            health.IncreaseStress(100);
+            health.Heal(100);
             health.Tired(20);
             
 

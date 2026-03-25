@@ -23,6 +23,7 @@ public class Player : MonoBehaviour
 
                 if (itemAdded) 
                 { 
+                    item.ShowPopUp();
                     Destroy(collision.gameObject);
                 }
             }

@@ -1,16 +1,24 @@
 ﻿using DPUtils.System.DateTime;
+using NUnit.Framework;
 using NUnit.Framework.Interfaces;
 using System.Collections;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Unity.Cinemachine;
+using UnityEditor.Overlays;
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
 using UnityEngine.SceneManagement;
+using System.Threading.Tasks;
+
 public class SaveController : MonoBehaviour
 {
     private string saveLocation;
 
     private InventoryController inventoryController;
+
+    private Chest[] chests;
 
     private TimeManager timeManager; 
 
@@ -22,19 +30,21 @@ public class SaveController : MonoBehaviour
 
     public static bool PendingReset = false;
 
-    void Start()
+
+    async void Start()
     {
-        saveLocation = Path.Combine(Application.persistentDataPath, "saveData.json");
-        inventoryController = FindAnyObjectByType<InventoryController>();
-        timeManager = FindAnyObjectByType<TimeManager>(); //Add
-        globalLight = GameObject.FindGameObjectWithTag("GlobalLight").GetComponent<Light2D>();
-        playerHealth = GameObject.FindGameObjectWithTag("Player").GetComponent<Health>();
+        InitializeComponents();
 
         // Reset sau khi scene load xong
         if (PendingReset)
         {
             PendingReset = false;
             PerformResetAfterLoad();
+
+            await Task.Yield();
+
+            if (ScreenFader.Instance != null)
+                await ScreenFader.Instance.FadeIn();
             return;
         }
 
@@ -42,7 +52,7 @@ public class SaveController : MonoBehaviour
         if (GameStartupMode.IsNewGame)
         {
             GameStartupMode.IsNewGame = false;
-            ResetGame();
+            await ResetGame();
             return;
         }
 
@@ -50,30 +60,58 @@ public class SaveController : MonoBehaviour
         if (GameStartupMode.IsLoadGame)
         {
             GameStartupMode.IsLoadGame = false;
-            LoadGame();
+            await LoadGame();
             return;
         }
 
         // Default (Editor Play)
-        if (File.Exists(saveLocation))  
-            LoadGame();
+        if (File.Exists(saveLocation))
+            await LoadGame();
         else
-            ResetGame();
+            await ResetGame();
     }
 
+    private void InitializeComponents()
+    {
+        saveLocation = Path.Combine(Application.persistentDataPath, "saveData.json");
+        inventoryController = FindAnyObjectByType<InventoryController>();
+        chests = FindObjectsOfType<Chest>();
+        timeManager = FindAnyObjectByType<TimeManager>(); //Add
+        globalLight = GameObject.FindGameObjectWithTag("GlobalLight").GetComponent<Light2D>();
+        playerHealth = GameObject.FindGameObjectWithTag("Player").GetComponent<Health>();
+    }
     public void SaveGame()
     {
         
         var currentTime = GetCurrentGameTime(); // Lấy thời gian hiện tại trong game
 
+        List<NPCSaveData> npcs = new List<NPCSaveData>();
+        NPC[] allNPCs = FindObjectsOfType<NPC>(); // Tìm tất cả NPC trong Scene
+
+        foreach (NPC npc in allNPCs)
+        {
+            npcs.Add(new NPCSaveData
+            {
+                npcName = npc.gameObject.name,
+                position = npc.transform.position
+            });
+        }
+
         SaveData saveData = new SaveData
         {
             playerPosition = GameObject.FindGameObjectWithTag("Player").transform.position,
 
+            npcSaveData = npcs,
+
             mapBoundary = FindAnyObjectByType<CinemachineConfiner2D>().BoundingShape2D.gameObject.name,
 
             inventorySaveData = inventoryController.GetInventoryItems(),
-            
+
+            toolbarSaveData = inventoryController.GetItemsFromPanel(inventoryController.toolbarPanel), // Thêm dòng này
+
+            chestSaveData = GetChestsState(),
+
+            questProgressData = QuestController.Instance.activateQuests,
 
             globalLightIntensity = globalLight != null ? globalLight.intensity : 1f, //  Light Save
 
@@ -93,89 +131,186 @@ public class SaveController : MonoBehaviour
             Stress = playerHealth.Stress
         };
 
+        // Tìm tất cả các shop trong scene và lưu lại
+        List<ShopItemSaveData> shops = new List<ShopItemSaveData>();
+        ShopManager[] allShops = FindObjectsOfType<ShopManager>();
+        foreach (var shop in allShops)
+        {
+            shops.Add(shop.GetShopSaveData());
+        }
+
+        // Gán vào saveData
+        saveData.allShopsData = shops;
+
         File.WriteAllText(saveLocation, JsonUtility.ToJson(saveData));
 
         Debug.Log($"Saved: {currentTime.DateToString()} {currentTime.TimeToString()} | Light={globalLight.intensity} " +
-            $"| HP={playerHealth.HP}, Gold={playerHealth.Gold} | MN={playerHealth.MN}, Stress={playerHealth.Stress}");
+            $"| HP={playerHealth.HP}, Gold={playerHealth.Gold} | MN={playerHealth.MN}, Stress={playerHealth.Stress}" + "Game & NPCs Saved!");
  
     }
 
-    public void LoadGame()
+    private List<ChestSaveData> GetChestsState()
+    {
+        List<ChestSaveData> chestStates = new List<ChestSaveData>();
+
+        foreach(Chest chest in chests)
+        {
+            ChestSaveData chestSaveData = new ChestSaveData
+            {
+                chestID = chest.ChestID,
+                isOpened = chest.IsOpened,
+            };
+            chestStates.Add(chestSaveData);
+        }
+        return chestStates;
+    }
+
+    public async Task LoadGame()
     {
 
         IsLoadingGame = true;
 
+        if (ScreenFader.Instance != null)
+            await ScreenFader.Instance.FadeOut();
+
         if (File.Exists(saveLocation))
         {
             SaveData saveData = JsonUtility.FromJson<SaveData>(File.ReadAllText(saveLocation));
 
-
-            // Player Position
-            GameObject.FindGameObjectWithTag("Player").transform.position = saveData.playerPosition;
-
-            // Player Camera
-
-            FindAnyObjectByType<CinemachineConfiner2D>().BoundingShape2D = GameObject.Find(saveData.mapBoundary).GetComponent<BoxCollider2D>();
-
-            // Player Inventory
-            inventoryController.SetInventoryItems(saveData.inventorySaveData);
-   
-
-            // Player Health
-            if (playerHealth != null && saveData != null)
-            {
-                playerHealth.Adjust(saveData.HP);
-                playerHealth.AdjustMN(saveData.MN);
-                playerHealth.SetGold(saveData.Gold);
-                playerHealth.SetStress(saveData.Stress);
-
-                Debug.Log($"❤️ Restored HP={playerHealth.HP}, MN={playerHealth.MN}, Gold={playerHealth.Gold}, Stress={playerHealth.Stress}");
-            }
-
-
-            // Tạo lại thời gian từ dữ liệu đã lưu
-            var loadedTime = new DPUtils.System.DateTime.DateTime(
-                saveData.date,
-                saveData.season,
-                saveData.year,
-                saveData.hour,
-                saveData.minutes
-            );
-
-            // Cập nhật lại vào TimeManager
-            SetCurrentGameTime(loadedTime);
-            Debug.Log($"⏰ Loaded Time: {loadedTime.DateToString()} {loadedTime.TimeToString()}");
-
-            // Light
-            
-            globalLight.intensity = saveData.globalLightIntensity;
-            Debug.Log($"☀️ Restored Light Intensity: {saveData.globalLightIntensity}");
-            }
+            ExecuteLoad(saveData);
+        }
         else
         {
             SaveGame();
         }
+
+        if (ScreenFader.Instance != null) await ScreenFader.Instance.FadeIn();
 
         IsLoadingGame = false;
     }
 
+    private void LoadChestStates(List<ChestSaveData> chestStates)
+    {
+        foreach (Chest chest in chests)
+        {
+            ChestSaveData chestSaveData = chestStates.FirstOrDefault(c => c.chestID == chest.ChestID);
+            if (chestSaveData != null)
+            {
+                chest.SetOpened(chestSaveData.isOpened);
+            }
+        }
+    }
 
-    public void LoadGameButton()
+    public async void LoadGameButton()
     {
         if (File.Exists(saveLocation))
         {
+            
+            if (ScreenFader.Instance != null) await ScreenFader.Instance.FadeOut();
+
             SaveData saveData = JsonUtility.FromJson<SaveData>(File.ReadAllText(saveLocation));
-            StartCoroutine(LoadAfterStart(saveData));
+            
+            ExecuteLoad(saveData);
+
+            await ScreenFader.Instance.FadeIn();
         }
         else
         {
             SaveGame();
         }
     }
+    
+    private void ExecuteLoad(SaveData saveData)
+    {
+        // Player Position
+        GameObject.FindGameObjectWithTag("Player").transform.position = saveData.playerPosition;
 
+        // Player Camera
+
+        FindAnyObjectByType<CinemachineConfiner2D>().BoundingShape2D = GameObject.Find(saveData.mapBoundary).GetComponent<BoxCollider2D>();
+
+        // Player Inventory
+        inventoryController.SetInventoryItems(saveData.inventorySaveData);
+
+        // Load Toolbar 
+        inventoryController.SetToolbarItems(saveData.toolbarSaveData);
+
+        // Load Quest Inventory
+        QuestController.Instance.LoadQuestProgress(saveData.questProgressData);
+
+        // Player Health
+        if (playerHealth != null && saveData != null)
+        {
+            playerHealth.Adjust(saveData.HP);
+            playerHealth.AdjustMN(saveData.MN);
+            playerHealth.SetGold(saveData.Gold);
+            playerHealth.SetStress(saveData.Stress);
+
+            Debug.Log($"❤️ Restored HP={playerHealth.HP}, MN={playerHealth.MN}, Gold={playerHealth.Gold}, Stress={playerHealth.Stress}");
+        }
+
+
+        if (saveData.npcSaveData != null)
+        {
+            foreach (var npcData in saveData.npcSaveData)
+            {
+                GameObject npcObj = GameObject.Find(npcData.npcName);
+                if (npcObj != null)
+                {
+                    NPC npcScript = npcObj.GetComponent<NPC>();
+                    UnityEngine.AI.NavMeshAgent agent = npcObj.GetComponent<UnityEngine.AI.NavMeshAgent>();
+
+                    if (agent != null)
+                    {
+                        agent.Warp(npcData.position);
+                    }
+                    else
+                    {
+                        npcObj.transform.position = npcData.position;
+                    }
+                }
+            }
+        }
+
+        // Tạo lại thời gian từ dữ liệu đã lưu
+        var loadedTime = new DPUtils.System.DateTime.DateTime(
+        saveData.date,
+        saveData.season,
+        saveData.year,
+        saveData.hour,
+            saveData.minutes
+        );
+
+        // Load Shop Data
+        if (saveData.allShopsData != null)
+        {
+            ShopManager[] allShops = FindObjectsOfType<ShopManager>();
+            foreach (var shop in allShops)
+            {
+                var data = saveData.allShopsData.Find(s => s.shopID == shop.shopID);
+                if (data != null)
+                {
+                    shop.LoadShopSaveData(data);
+                }
+            }
+        }
+
+        //Load ChestStates
+        LoadChestStates(saveData.chestSaveData);
+        // Cập nhật lại vào TimeManager
+        SetCurrentGameTime(loadedTime);
+        Debug.Log($"⏰ Loaded Time: {loadedTime.DateToString()} {loadedTime.TimeToString()}");
+
+        // Light
+
+        globalLight.intensity = saveData.globalLightIntensity;
+        Debug.Log($"☀️ Restored Light Intensity: {saveData.globalLightIntensity}");
+    }
+    
+    /*
     private IEnumerator LoadAfterStart(SaveData saveData)
     {
-        yield return null;  // ⬅ delay 1 frame để InventoryController.Start() chạy xong
+        yield return null;  // delay 1 frame để InventoryController.Start() chạy xong
 
         // Player Position
         GameObject.FindGameObjectWithTag("Player").transform.position = saveData.playerPosition;
@@ -184,8 +319,11 @@ public class SaveController : MonoBehaviour
         FindAnyObjectByType<CinemachineConfiner2D>().BoundingShape2D =
             GameObject.Find(saveData.mapBoundary).GetComponent<BoxCollider2D>();
 
-        // Player Inventory (bây giờ itemDictionary đã được gán)
+        // Player Inventory
         inventoryController.SetLoadInventoryItems(saveData.inventorySaveData);
+
+        // Load Toolbar 
+        inventoryController.SetToolbarItems(saveData.toolbarSaveData);
 
         // Player Health
         if (playerHealth != null)
@@ -194,6 +332,18 @@ public class SaveController : MonoBehaviour
             playerHealth.AdjustMN(saveData.MN);
             playerHealth.SetGold(saveData.Gold);
             playerHealth.SetStress(saveData.Stress);
+        }
+
+        // Load NPC Position
+        foreach (var npcData in saveData.npcSaveData)
+        {
+            GameObject npcObj = GameObject.Find(npcData.npcName);
+            if (npcObj != null)
+            {
+                var agent = npcObj.GetComponent<UnityEngine.AI.NavMeshAgent>();
+                if (agent != null) agent.Warp(npcData.position);
+                else npcObj.transform.position = npcData.position;
+            }
         }
 
         // Time
@@ -205,7 +355,7 @@ public class SaveController : MonoBehaviour
         // Light
         globalLight.intensity = saveData.globalLightIntensity;
     }
-
+    */
 
     // Hàm phụ để lấy và set thời gian an toàn
     private DPUtils.System.DateTime.DateTime GetCurrentGameTime()
@@ -238,7 +388,7 @@ public class SaveController : MonoBehaviour
         // Reset health
         playerHealth.HealFull();
         playerHealth.HealFullMN();
-        playerHealth.SetGold(0);
+        playerHealth.SetGold(1000);
         playerHealth.SetStress(playerHealth.MaxStress);
 
 
@@ -248,8 +398,10 @@ public class SaveController : MonoBehaviour
         Debug.Log("Reset hoàn tất sau khi load scene!");
     }
 
-    public void ResetGame()
+    async Task ResetGame()
     {
+        if (ScreenFader.Instance != null) await ScreenFader.Instance.FadeOut();
+
         if (File.Exists(saveLocation))
         {
             File.Delete(saveLocation);
@@ -260,6 +412,13 @@ public class SaveController : MonoBehaviour
 
         Time.timeScale = 1f;
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+
+    }
+
+    public void OnClickResetButton()
+    {
+        // Sử dụng "_" để nhận biết là Task chạy độc lập
+        _ = ResetGame();
     }
 
     public void timeScale()

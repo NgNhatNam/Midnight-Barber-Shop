@@ -1,0 +1,136 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a85f33e7c008ee549b980456266d92b8, type: 3}
+  m_Name: Vy
+  m_EditorClassIdentifier: Assembly-CSharp::NPCDialogie
+  npcName: Vy
+  npcPortrait: {fileID: 21300000, guid: 4dc0566c53d86f24ea1d8cf07f25b6dd, type: 3}
+  typingSpeed: 0.05
+  voidSound: {fileID: 8300000, guid: 70e42e5223f073443ad04edd67f46ceb, type: 3}
+  voicePitch: 1
+  autoPorgressDelay: 1.5
+  defaultDialogueGroups:
+  - groupName: Fun
+    dialogueLines:
+    - text: "Ch\xE0o c\u1EADuu"
+      autoProgress: 1
+      isInProgressLine: 0
+      isCompletedLine: 0
+      branchChoice: []
+    - text: "H\xF4m nay tr\u1EDDi \u0111\u1EB9p nh\u1EC9"
+      autoProgress: 0
+      isInProgressLine: 0
+      isCompletedLine: 0
+      branchChoice: []
+  - groupName: Angry
+    dialogueLines:
+    - text: "Ch\xE0o \u0111\u1EB1ng \u1EA5y"
+      autoProgress: 1
+      isInProgressLine: 0
+      isCompletedLine: 0
+      branchChoice: []
+    - text: "\u0110\u1EB1ng \u1EA5y kh\xF4ng c\u1EA7n n\xF3i chuy\u1EC7n v\u1EDBi
+        \u0111\xE2y \u0111\xE2u"
+      autoProgress: 0
+      isInProgressLine: 0
+      isCompletedLine: 0
+      branchChoice: []
+  - groupName: Sad
+    dialogueLines:
+    - text: "C\u1EADu c\xF3 ngh\u0129 cu\u1ED9c s\u1ED1ng n\u01A1i \u0111\xE2y th\u1EADt
+        y\xEAn b\xECnh kh\xF4ng"
+      autoProgress: 0
+      isInProgressLine: 0
+      isCompletedLine: 0
+      branchChoice: []
+  conditionalGroups:
+  - description: Mua sushi
+    minLevel: 0
+    requiredSeason: 0
+    startHour: 0
+    endHour: 23
+    startDate: 0
+    quest: {fileID: 11400000, guid: a6cf6ef8987d7b64796c9e3089bc0c31, type: 2}
+    questDurationHours: 0
+    dialogueLines:
+    - text: "N\xE0y t\u1EDB nh\u1EDD c\u1EADu m\u1ED9t ch\xFAt \u0111\u01B0\u1EE3c
+        kh\xF4ng"
+      autoProgress: 1
+      isInProgressLine: 0
+      isCompletedLine: 0
+      branchChoice:
+      - choices: "\u0110\u01B0\u1EE3c"
+        nextLines:
+        - text: "V\u1EADy gi\xFAp t\u1EDB mua 2 ph\u1EA7n Sushi v\u1EDBi nh\xE9"
+          autoProgress: 0
+          isInProgressLine: 0
+          isCompletedLine: 0
+          branchChoice: []
+        - text: "C\u1EA3m \u01A1n c\u1EADu tr\u01B0\u1EDBc n\xE8"
+          autoProgress: 0
+          isInProgressLine: 0
+          isCompletedLine: 0
+          branchChoice: []
+        giveQuest: 1
+      - choices: "Kh\xF4ng"
+        nextLines:
+        - text: "Th\u1EBF th\xEC th\xF4i v\u1EADy"
+          autoProgress: 0
+          isInProgressLine: 0
+          isCompletedLine: 0
+          branchChoice: []
+        giveQuest: 0
+    - text: "Nh\u1EDD c\u1EADu mua gi\xFAp t\u1EDB nh\xE9"
+      autoProgress: 0
+      isInProgressLine: 1
+      isCompletedLine: 0
+      branchChoice: []
+    - text: "C\u1EA3m \u01A1n c\u1EADuu"
+      autoProgress: 0
+      isInProgressLine: 0
+      isCompletedLine: 1
+      branchChoice: []
+    - text: "\u0110\xE2y l\xE0 qu\xE0 c\u1EE7a c\u1EADu"
+      autoProgress: 0
+      isInProgressLine: 0
+      isCompletedLine: 1
+      branchChoice: []
+  - description: "Vy \u0111\xF3i"
+    minLevel: 1
+    requiredSeason: 0
+    startHour: 3
+    endHour: 23
+    startDate: 2
+    quest: {fileID: 11400000, guid: 40c5f55ebe59bbb4599b3dfdf2a37b8d, type: 2}
+    questDurationHours: 0
+    dialogueLines:
+    - text: "T\u1EDB h\u1ECFi c\xE1i n\xE0y \u0111\u01B0\u1EE3c kh\xF4ng"
+      autoProgress: 1
+      isInProgressLine: 0
+      isCompletedLine: 0
+      branchChoice:
+      - choices: 
+        nextLines: []
+        giveQuest: 0
+      - choices: 
+        nextLines: []
+        giveQuest: 0
+    - text: "Hihi nh\u1EDD v\u1EA3 v\xE0o c\u1EADu"
+      autoProgress: 0
+      isInProgressLine: 1
+      isCompletedLine: 0
+      branchChoice: []
+    - text: "C\u1EA3m \u01A1n c\u1EADu, i love uu"
+      autoProgress: 0
+      isInProgressLine: 0
+      isCompletedLine: 1
+      branchChoice: []

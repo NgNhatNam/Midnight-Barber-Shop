@@ -7,6 +7,7 @@ public class PlayerController : MonoBehaviour
 {
     [SerializeField] private float walkSpeed = 4f;
     [SerializeField] private float runSpeed = 6f;
+    [SerializeField] private float joystickRunThreshold = 0.7f;
 
     //private MapTransation mapTransation;
     private Vector2 moveInput;
@@ -17,7 +18,9 @@ public class PlayerController : MonoBehaviour
     private AudioController audioController;
 
     private string currentAnimation;
-    private bool isRunningPressed;
+    
+    private bool isRunning;
+
     private bool isHit = false;
 
     [SerializeField] private float attackDelay = 0.2f;
@@ -44,6 +47,72 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
+        // 1. Xử lý tấn công
+        HandleAttack();
+
+        // 2. NHẬN DIỆN THIẾT BỊ ĐỂ QUYẾT ĐỊNH CHẠY/ĐI BỘ
+        CheckMovementState();
+    }
+
+    private void CheckMovementState()
+    {
+        // Kiểm tra nếu đang dùng Bàn phím (PC)
+        bool isUsingKeyboard = false;
+        if (Keyboard.current != null && (Keyboard.current.anyKey.isPressed))
+        {
+            isUsingKeyboard = true;
+        }
+
+        if (isUsingKeyboard)
+        {
+            // PC: Chạy khi giữ Shift
+            isRunning = Keyboard.current.leftShiftKey.isPressed;
+        }
+        else
+        {
+            // Mobile: Chạy khi kéo Joystick vượt ngưỡng Threshold (0.7)
+            isRunning = moveInput.magnitude >= joystickRunThreshold;
+        }
+    }
+
+    private void HandleAttack()
+    {
+        if ((Input.GetKeyDown(KeyCode.L) || Input.GetKeyDown(KeyCode.Mouse1)) && !isHit && playerCombats.enabled)
+        {
+            playerCombats?.Shoot(spriteRenderer.flipX);
+        }
+    }
+
+    private void FixedUpdate()
+    {
+        if (isHit || (playerCombats != null && playerCombats.IsAttacking))
+        {
+            rb2D.linearVelocity = Vector2.zero;
+            return;
+        }
+
+        // Tốc độ dựa trên trạng thái đã nhận diện ở Update
+        float currentSpeed = isRunning ? runSpeed : walkSpeed;
+
+        // DI CHUYỂN (Sử dụng MovePosition để tránh lỗi va chạm khựng)
+        Vector2 movement = moveInput.normalized * currentSpeed * Time.fixedDeltaTime;
+        rb2D.MovePosition(rb2D.position + movement);
+
+        // ANIMATION
+        if (moveInput.sqrMagnitude > 0.001f)
+        {
+            ChangeAnimationState(isRunning ? PLAYER_RUN : PLAYER_WALK);
+        }
+        else
+        {
+            rb2D.linearVelocity = Vector2.zero;
+            ChangeAnimationState(PLAYER_IDLE);
+        }
+    }
+
+    /*
+    void Update()
+    {
         if (Input.GetKeyDown(KeyCode.L) && !isHit && playerCombats.enabled == true 
             || Input.GetKeyDown(KeyCode.Mouse1) && !isHit && playerCombats.enabled == true)
         {
@@ -59,7 +128,7 @@ public class PlayerController : MonoBehaviour
         {
             isRunningPressed = false;
         }
-                                   
+
     }
 
     private void FixedUpdate()
@@ -71,11 +140,8 @@ public class PlayerController : MonoBehaviour
             return;
         }
 
-
         float currentSpeed = isRunningPressed ? runSpeed : walkSpeed;
         rb2D.linearVelocity = moveInput * currentSpeed;
-
-
         if (moveInput != Vector2.zero)
         {
             ChangeAnimationState(isRunningPressed ? PLAYER_RUN : PLAYER_WALK);
@@ -86,6 +152,7 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    */
     public void Flip()
     {
 

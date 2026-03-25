@@ -1,5 +1,6 @@
 ﻿using Unity.Cinemachine;
 using UnityEngine;
+using UnityEngine.AI;
 
 public class MapTransation : MonoBehaviour
 {
@@ -7,7 +8,6 @@ public class MapTransation : MonoBehaviour
     [SerializeField] Direction direction;
     [SerializeField] Transform teleportTargetPosition;
     CinemachineConfiner2D confiner;
-
     [SerializeField] float addtivePos = 2f;
 
     enum Direction { Up, Down, Left, Right, Teleport }
@@ -19,14 +19,15 @@ public class MapTransation : MonoBehaviour
     }
 
 
+
+    /*
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if (!collision.CompareTag("Player")) return;
 
         confiner.BoundingShape2D = mapBoundry;
         confiner.InvalidateBoundingShapeCache();
-
-        UpdatePlayerPosition(collision.gameObject);
+        UpdatePlayerPosition(gameObject);
 
         // Teleport Player
         Vector3 targetPos = teleportTargetPosition.position;
@@ -38,7 +39,30 @@ public class MapTransation : MonoBehaviour
             confiner.BoundingShape2D = mapBoundry;
             confiner.InvalidateBoundingShapeCache();
         }
+    }
+    */
 
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (!collision.CompareTag("Player")) return;
+        FadeTransition(collision.gameObject);
+    
+    }
+
+    async void FadeTransition(GameObject player)
+    {
+        await ScreenFader.Instance.FadeOut();
+
+        // 2. Cập nhật Camera (Confiner)
+        if (confiner != null && mapBoundry != null)
+        {
+            confiner.BoundingShape2D = mapBoundry;
+            confiner.InvalidateBoundingShapeCache();
+        }
+
+        // Dịch chuyển Player 
+        UpdatePlayerPosition(player);
+        await ScreenFader.Instance.FadeIn();
     }
 
     private void UpdatePlayerPosition(GameObject player)
@@ -72,5 +96,5 @@ public class MapTransation : MonoBehaviour
 
         player.transform.position = additivePos;
     }
-
+    
 }

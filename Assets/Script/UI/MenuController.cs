@@ -1,5 +1,7 @@
-﻿using UnityEngine;
+﻿using TMPro;
+using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class MenuController : MonoBehaviour
 {
@@ -8,9 +10,14 @@ public class MenuController : MonoBehaviour
     public GameObject toolBarCombats;
     public GameObject hairCut;
     public GameObject toolIcon;
+    public GameObject stickButton;
+    public GameObject useItemUI;
+    public GameObject shopUI;
+    
+    public GameObject interactButton;
+    private bool wasInteractActiveBeforeMenu = false;
 
     public GameObject exitUI;
-    
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -19,7 +26,8 @@ public class MenuController : MonoBehaviour
 
         menuCanvas.SetActive(false);
         
-        toolBarCombats.SetActive(false); ;
+        toolBarCombats.SetActive(false);
+
     }
 
     // Update is called once per frame
@@ -27,34 +35,51 @@ public class MenuController : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Tab))
         {
-            bool isMenuActive = !menuCanvas.activeSelf;
-            menuCanvas.SetActive(!menuCanvas.activeSelf);
-
-            
-            Time.timeScale = isMenuActive ? 0f : 1f;
+            ToggleMenu();
         }
 
-        
-        toolIcon.SetActive(!menuCanvas.activeSelf && !hairCut.activeSelf); 
-
+        toolIcon.SetActive(!menuCanvas.activeSelf && !hairCut.activeSelf);
 
         if (Input.GetKeyDown(KeyCode.C))
         {
-            toolBarCombats.SetActive(!toolBarCombats.activeSelf);
-            toolBar.SetActive(false); ;
-        }
-        else
-        {
-            toolBar.SetActive(true);
+            bool isCombatActive = !toolBarCombats.activeSelf;
+            toolBarCombats.SetActive(isCombatActive);
+            toolBar.SetActive(!isCombatActive);
         }
     }
 
+    public void ToggleMenu()
+    {
+        bool isOpening = !menuCanvas.activeSelf;
+
+        if (isOpening)
+        {
+            // --- KHI MỞ MENU ---
+            // Ghi nhớ trạng thái hiện tại của nút Interact trước khi tắt nó
+            wasInteractActiveBeforeMenu = interactButton.activeSelf;
+
+            menuCanvas.SetActive(true);
+            stickButton.SetActive(false);
+            interactButton.SetActive(false); // Luôn tắt khi mở Menu
+            shopUI.SetActive(false);
+            Time.timeScale = 0f;
+        }
+        else
+        {
+            // --- KHI ĐÓNG MENU ---
+            menuCanvas.SetActive(false);
+            stickButton.SetActive(true); // Move button luôn hiện lại khi đóng menu
+            useItemUI.SetActive(false);
+            // CHỈ hiện lại nút Interact nếu trước đó nó đang hiện (đang đứng gần NPC/Rương)
+            interactButton.SetActive(wasInteractActiveBeforeMenu);
+
+            Time.timeScale = 1f;
+        }
+    }
     public void TabExitButton()
     {
 
-        menuCanvas.SetActive(false);
-
-        Time.timeScale =1f;
+        if (menuCanvas.activeSelf) ToggleMenu();
     }
 
     public void ExitToMainMenu()
@@ -62,4 +87,5 @@ public class MenuController : MonoBehaviour
         SceneManager.LoadScene("MainMenu");
         Time.timeScale = 1f;
     }
+
 }

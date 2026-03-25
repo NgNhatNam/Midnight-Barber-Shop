@@ -9,6 +9,9 @@ TagManager:
   - Boss
   - Bullet
   - Audio
+  - NPC
+  - MapBound
+  - PlayerInteractRange
   layers:
   - Default
   - TransparentFX
@@ -16,7 +19,7 @@ TagManager:
   - 
   - Water
   - UI
-  - 
+  - MapBound
   - 
   - 
   - 

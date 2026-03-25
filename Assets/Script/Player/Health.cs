@@ -7,6 +7,15 @@ using UnityEngine.UI;
 public class Health : MonoBehaviour
 {
 
+    // Thêm vào class Health các biến này
+    [Header("Statistics")]
+    public int currentLevel = 1;
+    public int currentEXP = 0;
+    public int expToNextLevel = 100;
+    public int customersServed = 0;
+
+    //===========================================================
+
     [Header("Player UI")]
     public GameObject dieUI;
     public TMP_Text dayPlayedText;
@@ -54,7 +63,7 @@ public class Health : MonoBehaviour
         get => stress;
         private set
         {
-            var isIncrease = value > stress;
+            var isIncrease = value < stress;
             stress = Mathf.Clamp(value, 0, maxStress);
 
             if (isIncrease)
@@ -144,6 +153,26 @@ public class Health : MonoBehaviour
         }
     }
 
+    //===========================================================
+
+    // Kinh nghiệm và tổng khách đã cắt
+    public void AddExperience(int amount)
+    {
+        currentEXP += amount;
+        if (currentEXP >= expToNextLevel)
+        {
+            currentLevel++;
+            currentEXP -= expToNextLevel;
+            expToNextLevel = Mathf.RoundToInt(expToNextLevel * 1.3f); // Tăng độ khó
+        }
+    }
+
+    public void AddCustomer()
+    {
+        customersServed++;
+    }
+
+    //===========================================================
 
     // === EVENTS ===
     [Header("Health Events")]

@@ -46,15 +46,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -1574272164268961109, guid: bf8923f519df7484eb1f87737072aa3b, type: 3}
       propertyPath: amountHP
-      value: 50
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: -1574272164268961109, guid: bf8923f519df7484eb1f87737072aa3b, type: 3}
       propertyPath: amountMN
-      value: 50
+      value: 30
       objectReference: {fileID: 0}
     - target: {fileID: -1574272164268961109, guid: bf8923f519df7484eb1f87737072aa3b, type: 3}
       propertyPath: amountST
-      value: -10
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: -1574272164268961109, guid: bf8923f519df7484eb1f87737072aa3b, type: 3}
       propertyPath: itemName

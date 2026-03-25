@@ -1,0 +1,48 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a85f33e7c008ee549b980456266d92b8, type: 3}
+  m_Name: MeVy
+  m_EditorClassIdentifier: Assembly-CSharp::NPCDialogie
+  npcName: "V\xE2n"
+  npcPortrait: {fileID: -6039441143980059666, guid: ce34b12294b1a134baa1f77d34fe211d, type: 3}
+  typingSpeed: 0.05
+  voidSound: {fileID: 8300000, guid: 70e42e5223f073443ad04edd67f46ceb, type: 3}
+  voicePitch: 1
+  autoPorgressDelay: 1.5
+  defaultDialogueGroups:
+  - groupName: Funny
+    dialogueLines:
+    - text: "Ch\xE0o ch\xE1u"
+      autoProgress: 1
+      isInProgressLine: 0
+      isCompletedLine: 0
+      branchChoice: []
+    - text: "H\xF4m nay l\xE0 1 ng\xE0y tuy\u1EC7t v\u1EDDi \u0111\u1EC3 \u0111i
+        ch\u01A1i \u0111\u1EA5y"
+      autoProgress: 0
+      isInProgressLine: 0
+      isCompletedLine: 0
+      branchChoice: []
+  - groupName: ChaoHoi
+    dialogueLines:
+    - text: "Ch\xE1u mu\u1ED1n \u0103n g\xEC th\xEC \u0111\u1EBFn qu\xE1n c\u1EE7a
+        b\xE1c nh\xE9"
+      autoProgress: 1
+      isInProgressLine: 0
+      isCompletedLine: 0
+      branchChoice: []
+    - text: "Qu\xE1n c\u1EE7a b\xE1c \u1EDF khu ch\u1EE3 \u1EA5y"
+      autoProgress: 0
+      isInProgressLine: 0
+      isCompletedLine: 0
+      branchChoice: []
+  conditionalGroups: []

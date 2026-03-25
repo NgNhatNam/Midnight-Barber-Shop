@@ -26,6 +26,15 @@ public class PlayerCombats : MonoBehaviour
         playerController = GetComponent<PlayerController>();  
     }
 
+    private void Update()
+    {
+        
+        shootUI.SetActive(true);
+        
+        
+        
+    }
+
     public void Shoot(bool facingRight)
     {
 

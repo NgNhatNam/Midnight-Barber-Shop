@@ -1,4 +1,5 @@
-﻿using UnityEditor;
+﻿using System.Collections;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
 using static UnityEngine.EventSystems.EventTrigger;
@@ -49,27 +50,36 @@ public class PowerBarController : MonoBehaviour
 
     private void Update()
     {
-        // Chỉ hoạt động nếu menu đang bật
-        if (UI == null || !UI.activeSelf) 
+
+
+        /*/ Chỉ hoạt động nếu menu đang bật
+        
+
+        if (Input.GetKeyDown(resetKey))
+        {
+            ResetBar();
+        }
+        */
+        
+        if (UI == null || !UI.activeSelf)
         {
             ResetBar();
             return;
         }
+
+        // Bỏ đoạn check UI activeSelf ở đây vì Manager đã quản lý việc bật/tắt script rồi
+        if (isStopped) return;
 
         if (Input.GetKeyDown(resetKey))
         {
             ResetBar();
         }
 
-        if (isStopped) return;
-
         MoveMarker();
 
         if (Input.GetKeyDown(stopKey))
         {
-            CheckResult();
-            isStopped = true;
-
+            CutButton(); 
         }
 
     }
@@ -81,6 +91,8 @@ public class PowerBarController : MonoBehaviour
         {
             CheckResult();
             isStopped = true;
+            
+            
         }
     }
 
@@ -114,6 +126,38 @@ public class PowerBarController : MonoBehaviour
             speed *= 1f;
     }
 
+    public void CheckResult()
+    {
+        Health h = FindAnyObjectByType<Health>();
+
+        int score = 0;
+        int moneyFromSkill = 0;
+        float distance = Mathf.Abs(currentY - centerY);
+
+        // Tính tiền dựa trên vùng cắt (Giữ logic cũ của bạn)
+        if (distance <= score_10) { score = 10; moneyFromSkill = 200; h.AddExperience(50); h.Tired(4); }
+        else if (distance <= score_9) { score = 9; moneyFromSkill = 100; h.AddExperience(20); h.Tired(7); }
+        else if (distance <= score_7) { score = 7; moneyFromSkill = 60; h.AddExperience(15); h.Tired(10); }
+        else if (distance <= score_5) { score = 5; moneyFromSkill = 30; h.AddExperience(10); h.Tired(14); }
+        else { score = 0; moneyFromSkill = 0; h.AddExperience(0); h.Tired(20); }
+
+        isStopped = true;
+        // Gửi kết quả về Manager để tính thêm thưởng/phạt dựa trên mẫu tóc
+        customerManager.FinishHaircut(score, moneyFromSkill);
+        
+       
+        // tăng số lượng người đã cắt 
+        if (h != null)
+        {
+            h.AddCustomer();      // Tăng số người đã cắt
+            h.AddExperience(2);  
+        }
+
+        this.enabled = false;
+        this.gameObject.SetActive(false);
+    }
+
+    /*
     public void CheckResult()
     {
         int score = 0;
@@ -212,45 +256,7 @@ public class PowerBarController : MonoBehaviour
                 Debug.Log("❌ Cắt Soul FAILED → Trừ Stress mạnh!");
             }
         }
-        /*
-        float distance = Mathf.Abs(currentY - centerY);
-
-        int score = 0;
-
-        if (distance <= score_10)
-        {
-            score = 10;
-            health.Tired(1);
-            health.AddGold(200);
-        }
-        else if (distance <= score_9)
-        {
-            score = 9;
-            health.Tired(2);
-            health.AddGold(100);
-        }
-        else if (distance <= score_7)
-        {
-            score = 7;
-            health.Tired(3);
-            health.AddGold(60);
-        }
-        else if (distance <= score_5)
-        {
-            score = 5;
-            health.Tired(7);
-            health.AddGold(30);
-        }
-        else if (distance <= score_3)
-        {
-            score = 3;
-            health.DecreaseStress(100);
-            health.Tired(10);
-            health.AddGold(5);
-        }
-        else
-            score = 0;
-        */
+        
         Debug.Log($"🎯 Trúng! Vùng: {distance:F1} | Điểm: {score}" );
 
         // Gửi kết quả sang CustomerManager
@@ -261,12 +267,20 @@ public class PowerBarController : MonoBehaviour
 
         isStopped = true;
     }
-
+    */
     public void ResetBar()
     {
-        isStopped = false;
+        isStopped = false; // QUAN TRỌNG NHẤT
         movingUp = true;
-        currentY = -bar.rect.height / 2f;
-        marker.anchoredPosition = new Vector2(0, currentY);
+
+        // Đảm bảo lấy đúng chiều cao thanh bar tại thời điểm reset
+        if (bar != null)
+        {
+            currentY = -bar.rect.height / 2f;
+            marker.anchoredPosition = new Vector2(0, currentY);
+        }
+
+        this.enabled = true; // Tự bật lại chính nó
+        Debug.Log("PowerBar đã Reset: isStopped = " + isStopped);
     }
 }

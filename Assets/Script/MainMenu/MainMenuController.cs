@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.SceneManagement;
 using System.IO;
+using System.Threading.Tasks;
 
 public class MainMenuController : MonoBehaviour
 {
@@ -19,22 +20,36 @@ public class MainMenuController : MonoBehaviour
         settingGameUI.SetActive(true);
     }
 
-    public void NewGame()
+    async Task NewGame()
     {
+        if (ScreenFader.Instance != null) await ScreenFader.Instance.FadeOut();
         PlayerPrefs.SetString("GameMode", "New");
         SceneManager.LoadScene("World");
     }
 
-    public void LoadGame()
+    async Task LoadGame()
     {
         if (!File.Exists(saveLocation))
         {
             loadGameUI.SetActive(true);
             return;
         }
+        
+        if (ScreenFader.Instance != null)
+            await ScreenFader.Instance.FadeOut();
 
         PlayerPrefs.SetString("GameMode", "Load");
         SceneManager.LoadScene("World");
+    }
+
+    public void ButtonNewGame()
+    {
+        _ = NewGame();
+    }
+
+    public void ButtonLoadGame()
+    {
+        _ = LoadGame();
     }
 
     public void ExitGame()
