@@ -83,6 +83,14 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    public void OnAttackButtonPressed()
+    {
+        if (playerCombats != null && playerCombats.enabled && !isHit)
+        {
+            playerCombats.Shoot(spriteRenderer.flipX);
+        }
+    }
+
     private void FixedUpdate()
     {
         if (isHit || (playerCombats != null && playerCombats.IsAttacking))

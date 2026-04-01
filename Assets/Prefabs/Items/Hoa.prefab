@@ -138,7 +138,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6391254763345180303, guid: bf8923f519df7484eb1f87737072aa3b, type: 3}
       propertyPath: m_Name
-      value: Food 2
+      value: Hoa
       objectReference: {fileID: 0}
     - target: {fileID: 8932486624792334473, guid: bf8923f519df7484eb1f87737072aa3b, type: 3}
       propertyPath: m_Sprite

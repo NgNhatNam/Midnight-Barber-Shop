@@ -2,12 +2,8 @@
 using UnityEngine.UI;
 using TMPro;
 using System.Collections;
-using System.Collections.Generic;
 using DPUtils.System.DateTime;
 using Unity.Cinemachine;
-using UnityEngine.AI;
-
-
 
 public class CustomerManager : MonoBehaviour
 {
@@ -65,6 +61,7 @@ public class CustomerManager : MonoBehaviour
     
     public GameObject closeUI;
     public GameObject openUI;
+    public GameObject manaOut;
 
 
     public Image customerImage;
@@ -93,13 +90,6 @@ public class CustomerManager : MonoBehaviour
     public float bossThreshold = 0f; 
     public float soulChance = 0.30f;
 
-    [Header("Haircut")]
-    public HairData veryGoodHair;
-    public HairData goodHair;
-    public HairData normalHair;
-    public HairData notBadHair;
-    public HairData veryBadHair;
-
     [Header("Stop Cutting Confirmation UI")]
     public GameObject stopConfirmPanel;
 
@@ -126,11 +116,19 @@ public class CustomerManager : MonoBehaviour
 
     void Start()
     {
+        // Đảm bảo khi bắt đầu (hoặc load lại scene), tất cả ghế đều trống
+        if (seats != null)
+        {
+            isSeatOccupied = new bool[seats.Length];
+            for (int i = 0; i < isSeatOccupied.Length; i++)
+            {
+                isSeatOccupied[i] = false;
+            }
+        }
 
-        // Khởi tạo mảng trạng thái ghế dựa trên số lượng ghế bạn kéo vào
-        if (seats != null) isSeatOccupied = new bool[seats.Length];
-
-        // ... (Các dòng khởi tạo UI cũ của bạn) ...
+        // Reset các biến trạng thái phục vụ
+        isProcessingCustomer = false;
+        isCuttingHair = false;
         spawnTimer = 2f; // Khách đầu tiên sẽ đến sau 2 giây khi mở tiệm
 
         customerPanel.SetActive(false);
@@ -217,7 +215,19 @@ public class CustomerManager : MonoBehaviour
             }
         }
 
-        // Chỉ tự động Spawn khách khi tiệm đang trạng thái Mở (isShopOpen = true)
+        if (isShopOpen && health != null && health.MN <= 0)
+        {
+            isShopOpen = false;
+            if (isActive)
+            {
+                openUI.SetActive(false);
+                closeUI.SetActive(false);
+            }
+            StartCoroutine(PlayerIsTired()); // Hiện thông báo mệt mỏi
+            ClearAllCustomers();
+        }
+
+        // Chỉ tự động Spawn khách khi tiệm đang Mở 
         if (isShopOpen)
         {
             HandleAutoSpawn();
@@ -234,8 +244,16 @@ public class CustomerManager : MonoBehaviour
 
     public void ToggleShop()
     {
-        // Nếu người chơi không đứng ở tiệm thì không cho bấm (tùy bạn quyết định)
+        // Nếu người chơi không đứng ở tiệm thì không cho bấm 
         if (!isActive) return;
+
+        if (health != null && health.MN <= 0)
+        {
+            openUI.SetActive(false);
+            closeUI.SetActive(false);
+            StartCoroutine(PlayerIsTired());
+            return;
+        }
 
         var time = timeManager.GetCurrentDateTime();
 
@@ -253,6 +271,7 @@ public class CustomerManager : MonoBehaviour
             else
             {
                 Debug.Log("Tiệm đóng cửa!");
+                ClearAllCustomers();
                 openUI.SetActive(false);
                 closeUI.SetActive(true);
             }
@@ -266,26 +285,15 @@ public class CustomerManager : MonoBehaviour
         }
     }
 
+    IEnumerator PlayerIsTired()
+    {
+        manaOut.SetActive(true);
+        yield return new WaitForSeconds(1.5f);
+        manaOut.SetActive(false);
+    }
+
     //==================================================================================
 
-    private void OpenShop()
-    {
-        var currentTime = timeManager.GetCurrentDateTime();
-
-        // Chỉ cho mở nếu đang trong khung giờ phục vụ
-        if (currentTime.TimeToOpen())
-        {
-            isShopOpen = true;
-            openUI.SetActive(true);
-            closeUI.SetActive(false);
-            Debug.Log("Tiệm đã mở cửa! Đang đợi khách...");
-        }
-        else
-        {
-            Debug.Log("Chưa đến giờ mở cửa (6h-18h)!");
-        }
-    }
-   
     // SPAWN CUSTOMER
     private void HandleAutoSpawn()
     {
@@ -351,16 +359,25 @@ public class CustomerManager : MonoBehaviour
             isActive = true;
             buttonIcon.SetActive(true);
 
-            // Hiển thị UI dựa trên biến isShopOpen hiện tại
-            if (isShopOpen)
+            if (health != null && health.MN <= 0)
             {
-                openUI.SetActive(true);
+                openUI.SetActive(false);
                 closeUI.SetActive(false);
+
+                StartCoroutine(PlayerIsTired());
             }
             else
             {
-                openUI.SetActive(false);
-                closeUI.SetActive(true);
+                if (isShopOpen)
+                {
+                    openUI.SetActive(true);
+                    closeUI.SetActive(false);
+                }
+                else
+                {
+                    openUI.SetActive(false);
+                    closeUI.SetActive(true);
+                }
             }
         }
     }
@@ -410,12 +427,11 @@ public class CustomerManager : MonoBehaviour
         stopConfirmPanel.SetActive(false);
         HideCustomer();
     }
-   
+
     //-----------------------------------------------------------------------------------
-    
+
     public void BossFightButton()
     {
-
         playerController.enabled = true;
 
         if (player == null || bossWayPoint == null)
@@ -424,37 +440,43 @@ public class CustomerManager : MonoBehaviour
             return;
         }
 
-        // Dịch chuyển player
+
+        // Đóng quán ngay lập tức để HandleAutoSpawn không tạo thêm khách mới
+        isShopOpen = false;
+
+        // Cập nhật UI thông báo đóng cửa 
+        if (isActive)
+        {
+            openUI.SetActive(false);
+            closeUI.SetActive(true);
+        }
+
+        ClearAllCustomers();
+
+        // ------------------------------------------------
+
+        if (stickButton != null) stickButton.SetActive(true);
+
         player.transform.position = bossWayPoint.transform.position;
-        Debug.Log($"Dịch chuyển đến Boss WayPoint tại {bossWayPoint.transform.position}");
 
-
-        // Tự động tìm BoxCollider2D (map boundary) mà player đang ở trong đó
+        // Camera Confiner logic
         Collider2D collider = Physics2D.OverlapPoint(player.transform.position);
-
         if (collider != null && collider.GetComponent<BoxCollider2D>() != null)
         {
             var confiner = FindAnyObjectByType<CinemachineConfiner2D>();
-            confiner.BoundingShape2D = collider.GetComponent<BoxCollider2D>();
-            Debug.Log($"Camera confiner đã chuyển sang {collider.name}");
+            if (confiner != null)
+                confiner.BoundingShape2D = collider.GetComponent<BoxCollider2D>();
         }
-        else
-        {
-            Debug.LogWarning("Không tìm thấy BoxCollider2D map boundary tại vị trí player!");
-        }
-
 
         bossFightUI.SetActive(false);
         bossHealthUI.SetActive(true);
-
 
         if (customerPanel.activeSelf) customerPanel.SetActive(false);
         buttonIcon.SetActive(false);
 
         StartCoroutine(BossFightDelay());
-
     }
-    
+
     IEnumerator BossFightDelay()
     {
         yield return new WaitForSeconds(1.5f);
@@ -466,9 +488,40 @@ public class CustomerManager : MonoBehaviour
         enemyHealth.EnemyHeal(500);
         playerCombats.enabled = false;
         bossHealthUI.SetActive(false);
+        if (interactButton != null) interactButton.SetActive(false);
     }
 
     //============================================================================
+
+    private void ClearAllCustomers()
+    {
+        Customer[] allCustomers = FindObjectsByType<Customer>(FindObjectsSortMode.None);
+
+        foreach (Customer c in allCustomers)
+        {
+            // Nếu khách đang ngồi trên ghế và CHƯA được phục vụ
+            if (c.CanInteract())
+            {
+                // Gọi hàm rời đi kèm hình phạt (ví dụ phạt 15 điểm Stress cơ bản)
+                c.LeaveUnserved(5);
+            }
+            else
+            {
+                // Nếu khách đang đi vào hoặc đã phục vụ xong thì về bình thường
+                c.FinishAndLeave();
+            }
+
+            if (c.mySeat != null)
+            {
+                OnCustomerLeave(c.mySeat);
+            }
+        }
+
+        isProcessingCustomer = false;
+        isCuttingHair = false;
+        if (customerPanel.activeSelf) customerPanel.SetActive(false);
+    }
+
     public void ShowCustomer(Customer customer)
     {
         if (isProcessingCustomer) return;
@@ -479,35 +532,34 @@ public class CustomerManager : MonoBehaviour
 
         if (stickButton != null) stickButton.SetActive(false);
         if (interactButton != null) interactButton.SetActive(false);
-        // 1. Lấy dữ liệu khách hàng
+        // Lấy dữ liệu khách hàng
         currentCustomerData = PickCustomerData();
 
-        // 2. GÁN TỐC ĐỘ DỰA TRÊN LOẠI KHÁCH (Quan trọng)
+        
         if (currentCustomerData == soulData)
         {
-            powerBar.speed = 2000f; // Tốc độ nhanh cho Linh hồn
+            powerBar.speed = 2000f;
         }
         else if (currentCustomerData == bossData)
         {
-            powerBar.speed = 2500f; // Tốc độ cực nhanh cho Boss (nếu cần)
+            powerBar.speed = 2500f; 
         }
         else
         {
-            powerBar.speed = 1500f; // Tốc độ bình thường
+            powerBar.speed = 1500f; 
         }
 
-        // 3. Hiển thị UI ngoại hình
+        // Hiển thị UI ngoại hình
         customerImage.sprite = currentCustomerData.sprites[Random.Range(0, currentCustomerData.sprites.Count)];
         dialogueText.text = currentCustomerData.dialogues[Random.Range(0, currentCustomerData.dialogues.Count)];
 
-        // 4. Random mẫu tóc yêu cầu
+        // Random mẫu tóc yêu cầu
         targetHairRequest = hairDatabase.GetRandomHair();
         if (targetHairRequest != null)
         {
             targetHairRequestUI.sprite = targetHairRequest.hairSprite;
         }
 
-        // 5. Thiết lập UI ban đầu
         customerPanel.SetActive(true);
         hairBefore.SetActive(true);
         hairSelector.gameObject.SetActive(true);
@@ -518,25 +570,25 @@ public class CustomerManager : MonoBehaviour
 
         playerController.enabled = false;
 
-        // Báo cho script Customer biết là đã bắt đầu phục vụ để dừng đếm ngược bỏ về
+        // Báo cho Customer biết là đã bắt đầu phục vụ để dừng đếm ngược bỏ về
         customer.StartBeingServiced();
     }
 
     public void StartCuttingMinigame()
     {
-        // 1. Lưu thông tin tóc đã chọn
+        // Lưu thông tin tóc đã chọn
         HairEntry selected = hairSelector.GetSelectedHair();
         isCorrectStyleSelected = (selected.styleID == targetHairRequest.styleID);
         selectedHairSprite = selected.hairSprite; // Lưu lại Sprite để hiện ở bảng kết quả
 
-        // 2. Chuyển đổi UI
+        // Chuyển đổi UI
         
         hairSelector.gameObject.SetActive(false);
         powerBarUI.SetActive(true);
         
         powerBar.enabled = true;
         powerBar.gameObject.SetActive(true);
-        // 3. Reset PowerBar (Đặt lại vận tốc và trạng thái di chuyển)
+        // Reset PowerBar 
         powerBar.ResetBar();
 
         if (cutButton != null) cutButton.SetActive(true);
@@ -548,13 +600,12 @@ public class CustomerManager : MonoBehaviour
         int finalMoney = 0;
         string feedbackMessage = "";
 
-        // 1. Hiển thị mẫu tóc mà người chơi ĐÃ CHỌN lúc nãy
         if (hairResultImage != null)
         {
             hairResultImage.sprite = selectedHairSprite;
         }
 
-        // 2. Tính tiền và phản hồi
+        // Tính tiền và phản hồi
         if (isCorrectStyleSelected)
         {
             int bonusMatch = 100;
@@ -574,12 +625,22 @@ public class CustomerManager : MonoBehaviour
         moneyToday += finalMoney;
         customersToday++;
 
-        // 3. Dọn dẹp trạng thái PowerBar để khách sau không bị lỗi
+        // Dọn dẹp trạng thái PowerBar để khách sau không bị lỗi
         powerBar.enabled = false; // Tắt script để dừng Update bên trong PowerBar
         if (cutButton != null) cutButton.SetActive(false);
 
+        // Cập nhật thống kê vào Health
+        if (health != null) health.AddCustomer();
+
+        if (QuestController.Instance != null && currentCustomerData != null)
+        {
+            QuestController.Instance.OnCustomerServed(currentCustomerData.customerType);
+        }
+
         // Hiển thị Panel kết quả
         DisplayResult(skillScore, finalMoney, feedbackMessage);
+
+
     }
 
     private void DisplayResult(int score, int money, string msg)
@@ -589,10 +650,8 @@ public class CustomerManager : MonoBehaviour
         scoreText.text = "Điểm kỹ năng: " + score;
         hairResultText.text = msg;
 
-        // Đổi màu chữ tiền cho trực quan
         hairResultText.color = (money >= 0) ? Color.green : Color.red;
 
-        // Tự động tắt sau vài giây để đón khách tiếp theo
         StartCoroutine(ChangeCustomerRoutine());
     }
 
@@ -635,7 +694,7 @@ public class CustomerManager : MonoBehaviour
         if (currentDateTime.SoulTime())
         {
             float roll = Random.value;
-            if (roll < soulChance) // soulChance = 0.20f => 20% là linh hồn
+            if (roll < soulChance) 
             {
                 audioController.PlaySFX(audioController.soul, false);
                 return soulData;
@@ -656,49 +715,26 @@ public class CustomerManager : MonoBehaviour
         yield return new WaitForSeconds(1.4f);
         hairResultPanel.SetActive(false);
         HideCustomer();
-        /*
-        var time = timeManager.GetCurrentDateTime();
-        
-        if (time.TimeToOpen())
-        {
-            ShowCustomer();
-            powerBar.ResetBar();
-        }*/
     }
 
-    /*/ Hàm xử lý khi người chơi bấm nút "CẮT" trên UI
-    public void ConfirmHaircut()
+ 
+    public void damageOffDailyUI() 
     {
-        HairData selected = hairSelector.GetSelectedHair();
-        int score = 0;
-
-        // Logic tính điểm mới
-        if (selected.styleID == targetHairRequest.styleID)
+        daySummaryPanel.SetActive(false);
+        int firstDay = timeManager.GetCurrentDateTime().TotalNumDays;
+        if(firstDay <= 1)
         {
-            score = 10; // Cắt đúng ý
+            Debug.Log("Không bị mất máu");
         }
         else
         {
-            score = 3;  // Cắt sai kiểu
+            //health.Damage(10);
+            //health.DecreaseStress(10);
         }
-
-        // Sau khi có điểm, gọi lại logic trả tiền/về như cũ
-        ProcessResult(score);
     }
+}
 
-    private void ProcessResult(int score)
-    {
-        // Giữ nguyên logic tính tiền và chuyển cảnh của ReactToHaircut cũ
-        // nhưng thay đổi nội dung hiển thị kết quả
-        hairBefore.SetActive(false);
-        hairResultPanel.SetActive(true);
-        scoreText.text = "Điểm: " + score;
-
-        // ... logic cộng tiền, trừ stress của bạn ...
-
-        StartCoroutine(ChangeCustomerRoutine());
-    }
-    */
+/*
     private void ShowDailySummary()
     {
 
@@ -728,24 +764,7 @@ public class CustomerManager : MonoBehaviour
 
         Debug.Log("Summary ngày đã hiển thị");
     }
-
-    public void damageOffDailyUI() 
-    {
-        daySummaryPanel.SetActive(false);
-        int firstDay = timeManager.GetCurrentDateTime().TotalNumDays;
-        if(firstDay <= 1)
-        {
-            Debug.Log("Không bị mất máu");
-        }
-        else
-        {
-            //health.Damage(10);
-            //health.DecreaseStress(10);
-        }
-    }
-}
-
-/*
+ 
   public void ShowCustomer(Customer customer)
     {
         currentServingCustomer = customer; 

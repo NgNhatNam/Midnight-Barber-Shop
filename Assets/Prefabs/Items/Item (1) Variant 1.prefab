@@ -10,7 +10,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: -1574272164268961109, guid: bf8923f519df7484eb1f87737072aa3b, type: 3}
       propertyPath: ID
-      value: 10
+      value: 9
       objectReference: {fileID: 0}
     - target: {fileID: -1574272164268961109, guid: bf8923f519df7484eb1f87737072aa3b, type: 3}
       propertyPath: icon
@@ -18,7 +18,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -1574272164268961109, guid: bf8923f519df7484eb1f87737072aa3b, type: 3}
       propertyPath: price
-      value: 1000
+      value: 653
       objectReference: {fileID: 0}
     - target: {fileID: -1574272164268961109, guid: bf8923f519df7484eb1f87737072aa3b, type: 3}
       propertyPath: amountHP
@@ -26,7 +26,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -1574272164268961109, guid: bf8923f519df7484eb1f87737072aa3b, type: 3}
       propertyPath: amountMN
-      value: 30
+      value: 20
       objectReference: {fileID: 0}
     - target: {fileID: -1574272164268961109, guid: bf8923f519df7484eb1f87737072aa3b, type: 3}
       propertyPath: amountST

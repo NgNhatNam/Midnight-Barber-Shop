@@ -228,8 +228,6 @@ public class Enemy : MonoBehaviour
         playerHealth.ResetStress();
         playerHealth.AddGold(20000);
 
-
-
         FindAnyObjectByType<SaveController>().SaveGame();
     }
 

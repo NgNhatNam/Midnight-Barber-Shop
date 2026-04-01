@@ -19,7 +19,8 @@ public class Quest : ScriptableObject
     {
         if (string.IsNullOrEmpty(questID))
         {
-            questID = questName + Guid.NewGuid().ToString();
+            //questID = questName + Guid.NewGuid().ToString();
+            questID = name + "_" + UnityEngine.Random.Range(1000, 9999);
         }
 
     }
@@ -44,7 +45,7 @@ public enum ObjectiveType
     DefeatEnemy,
     ReachLocation,
     talkNPC,
-    Custom
+    ServeCustomer
 }
 
 [System.Serializable]
@@ -91,6 +92,7 @@ public class QuestProgress
 public class QuestReward
 {
     public RewardType type;
+    [Tooltip("Chỉ điền ID nếu chọn Type là Item. Nếu là Gold/EXP thì để là 0")]
     public int rewardID;
     public int amount = 1;
 }

@@ -87,14 +87,7 @@ public class Health : MonoBehaviour
         get => hp;
         private set
         {
-            /*
-            if (SaveController.IsLoadingGame)
-            {
-                hp = Mathf.Clamp(value, 0, maxHP);
-                Healed?.Invoke(hp);
-                return;
-            }*/
-
+          
             var isDamage = value < hp;
             hp = Mathf.Clamp(value, 0, maxHP);
             if (isDamage) 
@@ -147,7 +140,7 @@ public class Health : MonoBehaviour
             {
                 
                 ManaOut?.Invoke(mn);
-                DecreaseStress(50);
+                DecreaseStress(2);
             }
 
         }
@@ -201,8 +194,8 @@ public class Health : MonoBehaviour
         mn = maxMN;
         stress = maxStress;
     }
-    
-    
+
+
     //====Health=====
     public void Damage(int amount) => HP -= amount;  
     public void Heal(int amount) => HP += amount;
@@ -228,4 +221,28 @@ public class Health : MonoBehaviour
     public void SetStress(int value) => Stress = value;
     public void ResetStress() => Stress = 100;
 
+
+    private void OnEnable()
+    {
+        // Đăng ký lắng nghe sự kiện mỗi khi thời gian thay đổi
+        TimeManager.OnDateTimeChanged += HandleStressReductionOverTime;
+    }
+
+    private void OnDisable()
+    {
+        // Hủy đăng ký để tránh lỗi khi Object bị hủy
+        TimeManager.OnDateTimeChanged -= HandleStressReductionOverTime;
+    }
+
+    private void HandleStressReductionOverTime(DPUtils.System.DateTime.DateTime currentTime)
+    {
+        if (mn <= 0)
+        {
+            if (currentTime.Minutes == 0)
+            {
+                DecreaseStress(10);
+                Debug.Log("Đã giảm 10 Stress vì hết Mana (Nghỉ ngơi mỗi giờ)");
+            }
+        }
+    }
 }

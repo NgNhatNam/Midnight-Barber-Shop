@@ -10,9 +10,53 @@ public class RewardsController : MonoBehaviour
         else Destroy(gameObject);
     }
 
+
     public void GiveQuestReward(Quest quest)
     {
         if (quest == null || quest.questRewards == null) return;
+
+        // Tìm script Health của người chơi
+        Health playerHealth = FindAnyObjectByType<Health>();
+
+        foreach (var reward in quest.questRewards)
+        {
+            switch (reward.type)
+            {
+                case RewardType.Item:
+                    // Item thì mới cần rewardID
+                    GiveItemReward(reward.rewardID, reward.amount);
+                    break;
+
+                case RewardType.Gold:
+                    // Gold chỉ cần amount, bỏ qua rewardID (đúng ý bạn muốn)
+                    if (playerHealth != null)
+                    {
+                        playerHealth.AddGold(reward.amount);
+                        Debug.Log($"Nhận thưởng {reward.amount} Vàng!");
+                    }
+                    break;
+
+                case RewardType.Experience:
+                    // Tương tự Gold, chỉ cần amount
+                    if (playerHealth != null)
+                    {
+                        playerHealth.AddExperience(reward.amount);
+                        Debug.Log($"Nhận thưởng {reward.amount} EXP!");
+                    }
+                    break;
+
+                case RewardType.Custom:
+                    // Xử lý các loại thưởng đặc biệt khác nếu có
+                    break;
+            }
+        }
+    }
+
+    /*
+    public void GiveQuestReward(Quest quest)
+    {
+        if (quest == null || quest.questRewards == null) return;
+        Health playerHealth = FindAnyObjectByType<Health>();
 
         foreach (var reward in quest.questRewards)
         {
@@ -21,21 +65,18 @@ public class RewardsController : MonoBehaviour
                 case RewardType.Item:
                     //GiveItemReward
                     GiveItemReward(reward.rewardID, reward.amount);
-
                     break;
                 case RewardType.Gold:
-                    //GiveItemReward
                     break;
                 case RewardType.Experience:
-                    //GiveItemReward
                     break;
                 case RewardType.Custom:
                     //GiveItemReward
                     break;
             }
         }
-    }
-
+    }*/
+ 
     public void GiveItemReward(int itemID, int amount)
     {
         if (ItemDictionary.Instance == null) return;
@@ -64,30 +105,7 @@ public class RewardsController : MonoBehaviour
             }
         }
     }
-
-    /*
-    public void GiveItemReward(int itemID, int amount)
-    {
-
-        var itemPrefab = FindFirstObjectByType<ItemDictionary>()?.GetItemPrefab(itemID);
-        //var itemPrefab = ItemDictionary.Instance.GetItemPrefab(itemID);
-
-        if (itemPrefab == null) return;
-
-        for (int i = 0; i < amount; i++) 
-        {
-            if (!InventoryController.Instance.AddItem(itemPrefab))
-            {
-                GameObject dropedItem = Instantiate(itemPrefab, transform.position + Vector3.down, Quaternion.identity);
-                dropedItem.transform.position += new Vector3(Random.Range(-0.5f, 0.5f), -0.5f, 0);
-                
-            }
-            else
-            {
-                itemPrefab.GetComponent<Item>().ShowPopUp();
-            }
-        }
-    }*/
+    
 
 
 }

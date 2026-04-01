@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.InputSystem;
 
 public class InteractionDetector : MonoBehaviour
@@ -18,8 +18,17 @@ public class InteractionDetector : MonoBehaviour
         {
             interactableInRange?.Interact();
         }
+
     }
-    private void OnTriggerStay2D(Collider2D collision) // Enter th�nh stay 
+
+    
+    public void PerformInteraction()
+    {
+
+        interactableInRange.Interact();        
+    }
+    
+    private void OnTriggerStay2D(Collider2D collision) // Enter thành stay 
     {
         if (collision.TryGetComponent(out IInteractable interactable) && interactable.CanInteract())
         {

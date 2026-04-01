@@ -13,9 +13,6 @@ MonoBehaviour:
   m_Name: HairData
   m_EditorClassIdentifier: Assembly-CSharp::HairData
   allHairs:
-  - styleName: "T\xF3c 0"
-    hairSprite: {fileID: 21300000, guid: fa380cc1ecd09ee4f991911f5cce2514, type: 3}
-    styleID: 0
   - styleName: "T\xF3c 1"
     hairSprite: {fileID: 21300000, guid: 936b386039b9b1e4081eac9c1718e020, type: 3}
     styleID: 1
@@ -32,7 +29,7 @@ MonoBehaviour:
     hairSprite: {fileID: 21300000, guid: 424a3091525f06746870b51f69271e9b, type: 3}
     styleID: 5
   - styleName: "T\xF3c 6"
-    hairSprite: {fileID: 21300000, guid: bbb5c21b979abf14d8398fd216aacf2f, type: 3}
+    hairSprite: {fileID: 21300000, guid: fa380cc1ecd09ee4f991911f5cce2514, type: 3}
     styleID: 6
   - styleName: "T\xF3c 7"
     hairSprite: {fileID: 21300000, guid: 4ff6438fe2ce60d4ba46a6986a67c837, type: 3}

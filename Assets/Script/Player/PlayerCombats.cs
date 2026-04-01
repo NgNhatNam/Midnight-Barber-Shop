@@ -26,13 +26,20 @@ public class PlayerCombats : MonoBehaviour
         playerController = GetComponent<PlayerController>();  
     }
 
-    private void Update()
+    private void OnEnable()
     {
-        
-        shootUI.SetActive(true);
-        
-        
-        
+        if (shootUI != null)
+        {
+            shootUI.SetActive(true);
+        }
+    }
+
+    private void OnDisable()
+    {
+        if (shootUI != null)
+        {
+            shootUI.SetActive(false);
+        }
     }
 
     public void Shoot(bool facingRight)
@@ -76,5 +83,7 @@ public class PlayerCombats : MonoBehaviour
         yield return new WaitForSeconds(attackDelay);
         isAttacking = false;
     }
+
+
 
 }

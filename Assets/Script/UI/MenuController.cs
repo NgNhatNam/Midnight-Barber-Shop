@@ -10,6 +10,7 @@ public class MenuController : MonoBehaviour
     public GameObject toolBarCombats;
     public GameObject hairCut;
     public GameObject toolIcon;
+    //public GameObject cutHairButton;
     public GameObject stickButton;
     public GameObject useItemUI;
     public GameObject shopUI;

@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Unity.Cinemachine;
-using UnityEditor.Overlays;
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
 using UnityEngine.SceneManagement;
@@ -80,11 +79,20 @@ public class SaveController : MonoBehaviour
         globalLight = GameObject.FindGameObjectWithTag("GlobalLight").GetComponent<Light2D>();
         playerHealth = GameObject.FindGameObjectWithTag("Player").GetComponent<Health>();
     }
+   
     public void SaveGame()
     {
         
         var currentTime = GetCurrentGameTime(); // Lấy thời gian hiện tại trong game
 
+        // Stable
+        List<StableSaveData> stables = new List<StableSaveData>();
+        AnimalStable[] allStables = FindObjectsOfType<AnimalStable>();
+        foreach (var stable in allStables)
+        {
+            stables.Add(stable.GetStableSaveData());
+        }
+        //  NPC 
         List<NPCSaveData> npcs = new List<NPCSaveData>();
         NPC[] allNPCs = FindObjectsOfType<NPC>(); // Tìm tất cả NPC trong Scene
 
@@ -115,6 +123,8 @@ public class SaveController : MonoBehaviour
 
             globalLightIntensity = globalLight != null ? globalLight.intensity : 1f, //  Light Save
 
+            allStablesData = stables, // Stable Save
+
             // Time Save
             date = currentTime.Date,
             season = (int)currentTime.Season,
@@ -128,7 +138,11 @@ public class SaveController : MonoBehaviour
             MN = playerHealth.MN,
             MaxMN = playerHealth.MaxMN,
             Gold = playerHealth.Gold,
-            Stress = playerHealth.Stress
+            Stress = playerHealth.Stress,
+            currentLevel = playerHealth.currentLevel,
+            currentEXP = playerHealth.currentEXP,
+            expToNextLevel = playerHealth.expToNextLevel,
+            customersServed = playerHealth.customersServed,
         };
 
         // Tìm tất cả các shop trong scene và lưu lại
@@ -201,6 +215,7 @@ public class SaveController : MonoBehaviour
         }
     }
 
+    /*
     public async void LoadGameButton()
     {
         if (File.Exists(saveLocation))
@@ -220,6 +235,11 @@ public class SaveController : MonoBehaviour
         }
     }
     
+    */
+    public async void LoadGameButton()
+    {
+        await LoadGame();
+    }
     private void ExecuteLoad(SaveData saveData)
     {
         // Player Position
@@ -245,8 +265,12 @@ public class SaveController : MonoBehaviour
             playerHealth.AdjustMN(saveData.MN);
             playerHealth.SetGold(saveData.Gold);
             playerHealth.SetStress(saveData.Stress);
+            playerHealth.currentLevel = saveData.currentLevel;
+            playerHealth.currentEXP = saveData.currentEXP;
+            playerHealth.expToNextLevel = saveData.expToNextLevel;
+            playerHealth.customersServed = saveData.customersServed;
 
-            Debug.Log($"❤️ Restored HP={playerHealth.HP}, MN={playerHealth.MN}, Gold={playerHealth.Gold}, Stress={playerHealth.Stress}");
+            Debug.Log($" Restored HP={playerHealth.HP}, MN={playerHealth.MN}, Gold={playerHealth.Gold}, Stress={playerHealth.Stress}");
         }
 
 
@@ -295,6 +319,20 @@ public class SaveController : MonoBehaviour
             }
         }
 
+        // Load Save Stable
+        if (saveData.allStablesData != null)
+        {
+            AnimalStable[] allStables = FindObjectsOfType<AnimalStable>();
+            foreach (var stable in allStables)
+            {
+                var data = saveData.allStablesData.Find(s => s.stableID == stable.stableID || s.stableID == stable.gameObject.name);
+                if (data != null)
+                {
+                    stable.LoadStableSaveData(data);
+                }
+            }
+        }
+
         //Load ChestStates
         LoadChestStates(saveData.chestSaveData);
         // Cập nhật lại vào TimeManager
@@ -306,56 +344,6 @@ public class SaveController : MonoBehaviour
         globalLight.intensity = saveData.globalLightIntensity;
         Debug.Log($"☀️ Restored Light Intensity: {saveData.globalLightIntensity}");
     }
-    
-    /*
-    private IEnumerator LoadAfterStart(SaveData saveData)
-    {
-        yield return null;  // delay 1 frame để InventoryController.Start() chạy xong
-
-        // Player Position
-        GameObject.FindGameObjectWithTag("Player").transform.position = saveData.playerPosition;
-
-        // Player Camera
-        FindAnyObjectByType<CinemachineConfiner2D>().BoundingShape2D =
-            GameObject.Find(saveData.mapBoundary).GetComponent<BoxCollider2D>();
-
-        // Player Inventory
-        inventoryController.SetLoadInventoryItems(saveData.inventorySaveData);
-
-        // Load Toolbar 
-        inventoryController.SetToolbarItems(saveData.toolbarSaveData);
-
-        // Player Health
-        if (playerHealth != null)
-        {
-            playerHealth.Adjust(saveData.HP);
-            playerHealth.AdjustMN(saveData.MN);
-            playerHealth.SetGold(saveData.Gold);
-            playerHealth.SetStress(saveData.Stress);
-        }
-
-        // Load NPC Position
-        foreach (var npcData in saveData.npcSaveData)
-        {
-            GameObject npcObj = GameObject.Find(npcData.npcName);
-            if (npcObj != null)
-            {
-                var agent = npcObj.GetComponent<UnityEngine.AI.NavMeshAgent>();
-                if (agent != null) agent.Warp(npcData.position);
-                else npcObj.transform.position = npcData.position;
-            }
-        }
-
-        // Time
-        var loadedTime = new DPUtils.System.DateTime.DateTime(
-            saveData.date, saveData.season, saveData.year, saveData.hour, saveData.minutes);
-
-        SetCurrentGameTime(loadedTime);
-
-        // Light
-        globalLight.intensity = saveData.globalLightIntensity;
-    }
-    */
 
     // Hàm phụ để lấy và set thời gian an toàn
     private DPUtils.System.DateTime.DateTime GetCurrentGameTime()

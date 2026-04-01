@@ -9,7 +9,7 @@ public class Trap : MonoBehaviour
             health.SpendGold(1000);
             health.IncreaseStress(100);
             health.Heal(100);
-            health.Tired(20);
+            health.Tired(100);
             
 
         }

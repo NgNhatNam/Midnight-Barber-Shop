@@ -18,8 +18,7 @@ public class ShopUIDisplay : MonoBehaviour
 
     [Header("Status Visuals (Chỉ là UI trong bảng này)")]
     [SerializeField] private GameObject openUI;
-    [SerializeField] private GameObject closeUI;
-    [SerializeField] private GameObject closeWall;
+
 
     private void Awake()
     {
@@ -42,12 +41,9 @@ public class ShopUIDisplay : MonoBehaviour
         }
     }
 
-    // Hàm để cập nhật trạng thái hiển thị của các icon Open/Close trên UI
     public void UpdateStatusUI(bool isOpen)
     {
         if (openUI) openUI.SetActive(isOpen);
-        if (closeUI) closeUI.SetActive(!isOpen);
-        if (closeWall) closeWall.SetActive(!isOpen);
     }
 
     public bool IsUIActive()

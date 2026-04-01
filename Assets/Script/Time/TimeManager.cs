@@ -6,6 +6,8 @@ namespace DPUtils.System.DateTime
 {
     public class TimeManager : MonoBehaviour
     {
+        public static TimeManager Instance { get; private set; }
+
         [Header("Date & Time Setting")]
         [Range(1, 28)]
         public int dateInMonth;
@@ -31,6 +33,8 @@ namespace DPUtils.System.DateTime
 
         private void Awake()
         {
+            if (Instance == null) Instance = this;
+
             DateTime = new DateTime(dateInMonth, season - 1, year, hour, minutes * 10);
 
             Debug.Log($"New Year Day: {DateTime.NewYearsDay(2)}");
@@ -255,7 +259,7 @@ namespace DPUtils.System.DateTime
 
         public bool DaySummary()
         {
-            return hour >= 6 || hour  <= 6.30f;
+            return hour >= 6 || hour  < 6.30f;
         }
 
         public bool TimeToOpen()
@@ -265,7 +269,7 @@ namespace DPUtils.System.DateTime
 
         public bool TimeToAllShopOpen()
         {
-            return hour >= 6 && hour <= 18;
+            return hour >= 6 && hour < 18;
         }
 
         public bool SoulTime()
@@ -275,15 +279,15 @@ namespace DPUtils.System.DateTime
         }
         public bool IsNight()
         {
-            return hour > 18 || hour < 6;
+            return hour >= 18 || hour < 6;
         }
         public bool IsMorning()
         {
-            return hour > 6 || hour <= 12;
+            return hour >= 6 || hour < 12;
         }
         public bool IsAfterNoon()
         {
-            return hour > 12 || hour < 18;
+            return hour >= 12 || hour < 18;
         }
         public bool IsWeekend()
         {

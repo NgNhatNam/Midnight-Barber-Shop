@@ -5,6 +5,7 @@ using UnityEngine.AI;
 public class MapTransation : MonoBehaviour
 {
     [SerializeField] BoxCollider2D mapBoundry;
+
     [SerializeField] Direction direction;
     [SerializeField] Transform teleportTargetPosition;
     CinemachineConfiner2D confiner;
@@ -18,30 +19,90 @@ public class MapTransation : MonoBehaviour
 
     }
 
-
-
-    /*
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (!collision.CompareTag("Player")) return;
+        // 1. Nếu là Player: Có Fade Transition
+        if (collision.CompareTag("Player"))
+        {
+            FadeTransition(collision.gameObject);
+        }
+        // 2. Nếu là NPC: Dịch chuyển ngay lập tức (Warp) để không lỗi NavMesh
+        else if (collision.CompareTag("NPC"))
+        {
+            HandleNPCTransition(collision.gameObject);
+        }
+    }
 
-        confiner.BoundingShape2D = mapBoundry;
-        confiner.InvalidateBoundingShapeCache();
-        UpdatePlayerPosition(gameObject);
+    async void FadeTransition(GameObject player)
+    {
+        if (ScreenFader.Instance != null) await ScreenFader.Instance.FadeOut();
 
-        // Teleport Player
-        Vector3 targetPos = teleportTargetPosition.position;
-        collision.transform.position = targetPos;
+        // Cập nhật Camera (Confiner)
+        UpdateCameraBounds();
 
-        // Cập nhật confiner
+        // Dịch chuyển Player 
+        UpdatePosition(player);
+
+        if (ScreenFader.Instance != null) await ScreenFader.Instance.FadeIn();
+    }
+
+    private void HandleNPCTransition(GameObject npcGO)
+    {
+        UpdatePosition(npcGO); // Warp ở đây
+
+        // Gọi lệnh cập nhật lại đường đi cho NPC
+        NPC npcScript = npcGO.GetComponent<NPC>();
+        if (npcScript != null)
+        {
+            npcScript.OnMapTeleported();
+        }
+    }
+
+    private void UpdateCameraBounds()
+    {
         if (confiner != null && mapBoundry != null)
         {
             confiner.BoundingShape2D = mapBoundry;
             confiner.InvalidateBoundingShapeCache();
         }
     }
-    */
 
+    private void UpdatePosition(GameObject entity)
+    {
+        Vector3 targetPos;
+
+        if (direction == Direction.Teleport)
+        {
+            targetPos = teleportTargetPosition.position;
+        }
+        else
+        {
+            Vector2 offset = entity.transform.position;
+            switch (direction)
+            {
+                case Direction.Up: offset.y += addtivePos; break;
+                case Direction.Down: offset.y -= addtivePos; break;
+                case Direction.Left: offset.x -= addtivePos; break;
+                case Direction.Right: offset.x += addtivePos; break;
+            }
+            targetPos = offset;
+        }
+
+        // KIỂM TRA: Nếu có NavMeshAgent thì phải dùng Warp
+        NavMeshAgent agent = entity.GetComponent<NavMeshAgent>();
+        if (agent != null && agent.isActiveAndEnabled)
+        {
+            agent.Warp(targetPos); // Đây là lệnh quan trọng nhất cho NPC
+        }
+        else
+        {
+            entity.transform.position = targetPos;
+        }
+    }
+
+
+
+    /*
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if (!collision.CompareTag("Player")) return;
@@ -96,5 +157,6 @@ public class MapTransation : MonoBehaviour
 
         player.transform.position = additivePos;
     }
-    
+    */
+
 }

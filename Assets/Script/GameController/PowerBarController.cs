@@ -12,7 +12,6 @@ public class PowerBarController : MonoBehaviour
 
     
     private CustomerManager customerManager;
-    private Health health;
 
     [Header("UI Control")]
     public GameObject UI;
@@ -43,7 +42,6 @@ public class PowerBarController : MonoBehaviour
     private void Start()
     {
         customerManager = FindAnyObjectByType<CustomerManager>();  
-        health = FindAnyObjectByType<Health>();
         currentY = -bar.rect.height / 2f;
         marker.anchoredPosition = new Vector2(0, currentY);
     }
@@ -89,10 +87,8 @@ public class PowerBarController : MonoBehaviour
     {
         if (!isStopped)
         {
-            CheckResult();
             isStopped = true;
-            
-            
+            CheckResult();
         }
     }
 
@@ -144,13 +140,12 @@ public class PowerBarController : MonoBehaviour
         isStopped = true;
         // Gửi kết quả về Manager để tính thêm thưởng/phạt dựa trên mẫu tóc
         customerManager.FinishHaircut(score, moneyFromSkill);
-        
-       
+
+
         // tăng số lượng người đã cắt 
         if (h != null)
         {
-            h.AddCustomer();      // Tăng số người đã cắt
-            h.AddExperience(2);  
+            h.AddExperience(10);
         }
 
         this.enabled = false;
@@ -281,6 +276,6 @@ public class PowerBarController : MonoBehaviour
         }
 
         this.enabled = true; // Tự bật lại chính nó
-        Debug.Log("PowerBar đã Reset: isStopped = " + isStopped);
+        //Debug.Log("PowerBar đã Reset: isStopped = " + isStopped);
     }
 }

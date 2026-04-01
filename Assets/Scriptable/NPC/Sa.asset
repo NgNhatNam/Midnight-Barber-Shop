@@ -14,12 +14,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::NPCDialogie
   npcName: Sa
   npcPortrait: {fileID: 21300000, guid: e226a46eb7110304890cd1944b53a5e1, type: 3}
-  dialogueLines:
-  - "Ch\xE0o Nam"
-  - "H\xF4m nay tr\u1EDDi \u0111\u1EB9p ha"
-  - "T\u1EDB \u0111i nha"
-  autoProgressLines: 010000
-  autoPorgressDelay: 1.5
   typingSpeed: 0.05
   voidSound: {fileID: 8300000, guid: 70e42e5223f073443ad04edd67f46ceb, type: 3}
   voicePitch: 1
+  autoPorgressDelay: 1.5
+  conditionalGroups:
+  - description: 
+    minLevel: 0
+    requiredSeason: 0
+    startHour: 0
+    endHour: 0
+    startDate: 0
+    quest: {fileID: 0}
+    questDurationHours: 0
+    dialogueLines: []

@@ -10,7 +10,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: -1574272164268961109, guid: bf8923f519df7484eb1f87737072aa3b, type: 3}
       propertyPath: ID
-      value: 6
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: -1574272164268961109, guid: bf8923f519df7484eb1f87737072aa3b, type: 3}
       propertyPath: icon
@@ -18,7 +18,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -1574272164268961109, guid: bf8923f519df7484eb1f87737072aa3b, type: 3}
       propertyPath: price
-      value: 650
+      value: 230
       objectReference: {fileID: 0}
     - target: {fileID: -1574272164268961109, guid: bf8923f519df7484eb1f87737072aa3b, type: 3}
       propertyPath: amountHP
@@ -26,15 +26,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -1574272164268961109, guid: bf8923f519df7484eb1f87737072aa3b, type: 3}
       propertyPath: amountMN
-      value: 21
+      value: 13
       objectReference: {fileID: 0}
     - target: {fileID: -1574272164268961109, guid: bf8923f519df7484eb1f87737072aa3b, type: 3}
       propertyPath: amountST
-      value: 2
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: -1574272164268961109, guid: bf8923f519df7484eb1f87737072aa3b, type: 3}
       propertyPath: itemName
-      value: HotDog
+      value: Hot Dog
       objectReference: {fileID: 0}
     - target: {fileID: -339879578105206604, guid: bf8923f519df7484eb1f87737072aa3b, type: 3}
       propertyPath: m_Size.x

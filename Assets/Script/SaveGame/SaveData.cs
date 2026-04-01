@@ -20,6 +20,9 @@ public class SaveData
     public List<ChestSaveData> chestSaveData;
     public List<QuestProgress> questProgressData;
 
+    // Stable 
+    public List<StableSaveData> allStablesData = new List<StableSaveData>();
+
     // Shop Data
     public List<ShopItemSaveData> allShopsData = new List<ShopItemSaveData>();
 
@@ -41,6 +44,11 @@ public class SaveData
     public int MaxMN;
     public int Gold;
     public int Stress;
+
+    public int currentLevel;
+    public int currentEXP;
+    public int expToNextLevel;
+    public int customersServed;
 }
 
 
@@ -73,4 +81,20 @@ public class ItemStockData
 {
     public string itemName;
     public int stock;
+}
+
+[System.Serializable]
+public class AnimalSaveData
+{
+    public string animalPrefabName; // Để biết con này là Heo hay Gà khi load
+    public Vector3 position;
+    public int birthDayTotal; // Lưu ngày sinh để tính giá bán sau này
+    public int lastHarvestTotalDays; // Lưu ngày thu hoạch cuối cùng
+}
+
+[System.Serializable]
+public class StableSaveData
+{
+    public string stableID; // Tên hoặc ID của chuồng
+    public List<AnimalSaveData> animals = new List<AnimalSaveData>();
 }

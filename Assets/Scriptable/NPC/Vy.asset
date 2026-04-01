@@ -104,32 +104,49 @@ MonoBehaviour:
       isInProgressLine: 0
       isCompletedLine: 1
       branchChoice: []
-  - description: "Vy \u0111\xF3i"
+  - description: "Mua Th\u1ECBt "
     minLevel: 1
     requiredSeason: 0
-    startHour: 3
-    endHour: 23
+    startHour: 6
+    endHour: 12
     startDate: 2
     quest: {fileID: 11400000, guid: 40c5f55ebe59bbb4599b3dfdf2a37b8d, type: 2}
-    questDurationHours: 0
+    questDurationHours: 3
     dialogueLines:
-    - text: "T\u1EDB h\u1ECFi c\xE1i n\xE0y \u0111\u01B0\u1EE3c kh\xF4ng"
+    - text: "C\u1EADu c\xF3 th\u1EC3 mua gi\xFAp t\u1EDB \xEDt \u0111\u1ED3 \u0111\u01B0\u1EE3c
+        khum"
       autoProgress: 1
       isInProgressLine: 0
       isCompletedLine: 0
       branchChoice:
-      - choices: 
-        nextLines: []
-        giveQuest: 0
-      - choices: 
-        nextLines: []
+      - choices: "\u0110\u01B0\u1EE3c"
+        nextLines:
+        - text: "V\u1EADy c\u1EADu mua gi\xFAp t\u1EDB 2 mi\u1EBFng Th\u1ECBt B\xF2
+            nha"
+          autoProgress: 0
+          isInProgressLine: 0
+          isCompletedLine: 0
+          branchChoice: []
+        - text: "C\u1EA3m \u01A1n tr\u01B0\u1EDBc n\xE8"
+          autoProgress: 0
+          isInProgressLine: 0
+          isCompletedLine: 0
+          branchChoice: []
+        giveQuest: 1
+      - choices: "Kh\xF4ng"
+        nextLines:
+        - text: "V\u1EADy th\xEC th\xF4i, H\u1EB9n l\u1EA7n sau"
+          autoProgress: 0
+          isInProgressLine: 0
+          isCompletedLine: 0
+          branchChoice: []
         giveQuest: 0
     - text: "Hihi nh\u1EDD v\u1EA3 v\xE0o c\u1EADu"
       autoProgress: 0
       isInProgressLine: 1
       isCompletedLine: 0
       branchChoice: []
-    - text: "C\u1EA3m \u01A1n c\u1EADu, i love uu"
+    - text: "C\u1EA3m \u01A1n c\u1EADu hihi"
       autoProgress: 0
       isInProgressLine: 0
       isCompletedLine: 1

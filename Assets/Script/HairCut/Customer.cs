@@ -76,9 +76,7 @@ public class Customer : MonoBehaviour, IInteractable
         }
     }
 
-    // --- INTERFACE IINTERACTABLE ---
-
-    // Hàm này được gọi khi Player nhấn phím tương tác (E hoặc phím bạn đã cài)
+   
     public void Interact()
     {
         if (CanInteract())
@@ -92,7 +90,6 @@ public class Customer : MonoBehaviour, IInteractable
         }
     }
 
-    // Điều kiện để hiện icon tương tác và cho phép nhấn phím
     public bool CanInteract()
     {
         // Chỉ cho phép tương tác khi khách đã ngồi vào ghế và chưa được phục vụ
@@ -109,6 +106,12 @@ public class Customer : MonoBehaviour, IInteractable
 
     public void FinishAndLeave()
     {
+        CustomerManager manager = FindAnyObjectByType<CustomerManager>();
+        if (manager != null && mySeat != null)
+        {
+            manager.OnCustomerLeave(mySeat);
+        }
+
         // Chặn mọi Coroutine cũ trước khi đi về
         StopAllCoroutines();
         StartCoroutine(LeaveRoutine());
@@ -146,10 +149,25 @@ public class Customer : MonoBehaviour, IInteractable
     {
         CustomerManager manager = FindAnyObjectByType<CustomerManager>();
         if (manager != null) manager.OnCustomerLeave(mySeat);
-
+        LeaveUnserved(5);
         FinishAndLeave();
     }
 
+    public void LeaveUnserved(int stressPenalty)
+    {
+        if (isBeingServiced) return; 
+
+        Health playerHealth = FindAnyObjectByType<Health>();
+        if (playerHealth != null)
+        {
+            float waitRatio = 1f - (currentPatience / maxWaitTime);
+            int finalPenalty = stressPenalty + Mathf.RoundToInt(waitRatio * 10); // Chờ càng lâu phạt càng nặng
+
+            playerHealth.DecreaseStress(finalPenalty);
+        }
+
+        FinishAndLeave();
+    }
     void Update()
     {
         if (isSeated && !isBeingServiced)
@@ -180,34 +198,3 @@ public class Customer : MonoBehaviour, IInteractable
     }
 }
 
-/*using UnityEngine;
-using UnityEngine.UI;
-using UnityEngine.AI;
-using System.Collections;
-using TMPro;
-
-public class Customer : MonoBehaviour
-{
-
-    [Header("References")]
-    private Image customerImage;
-    private TMP_Text dialogueText;
-
-    [Header("Settings")]
-    public float maxWaitTime = 40f;
-
-
-    [HideInInspector] public CustomerData data;
-    
-    public void Init(CustomerData newData)
-    {
-        data = newData;
-
-        // Random sprite và thoại
-        customerImage.sprite = data.sprites[Random.Range(0, data.sprites.Count)];
-        dialogueText.text = data.dialogues[Random.Range(0, data.dialogues.Count)];
-
-    }
-   
-   
-}*/

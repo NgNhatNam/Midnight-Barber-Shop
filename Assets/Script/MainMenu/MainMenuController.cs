@@ -20,6 +20,7 @@ public class MainMenuController : MonoBehaviour
         settingGameUI.SetActive(true);
     }
 
+    /*
     async Task NewGame()
     {
         if (ScreenFader.Instance != null) await ScreenFader.Instance.FadeOut();
@@ -40,6 +41,52 @@ public class MainMenuController : MonoBehaviour
 
         PlayerPrefs.SetString("GameMode", "Load");
         SceneManager.LoadScene("World");
+    }
+    */
+
+    async Task NewGame()
+    {
+        await LoadSceneWithFade("New");
+    }
+
+    async Task LoadGame()
+    {
+        if (!File.Exists(saveLocation))
+        {
+            loadGameUI.SetActive(true);
+            return;
+        }
+
+        await LoadSceneWithFade("Load");
+    }
+    async Task LoadSceneWithFade(string mode)
+    {
+        // 1. Chạy hiệu ứng Fade Out (Màn hình tối dần)
+        if (ScreenFader.Instance != null)
+        {
+            await ScreenFader.Instance.FadeOut();
+        }
+
+        // 2. Lưu mode vào PlayerPrefs
+        PlayerPrefs.SetString("GameMode", mode);
+
+        // 3. Load Scene ngầm (Async)
+        AsyncOperation asyncLoad = SceneManager.LoadSceneAsync("World");
+
+        // Ngăn không cho Scene mới hiện ra ngay lập tức nếu chưa load xong
+        asyncLoad.allowSceneActivation = false;
+
+        // Đợi cho đến khi Scene mới load được 90% (mức sẵn sàng của Unity)
+        while (asyncLoad.progress < 0.9f)
+        {
+            await Task.Yield();
+        }
+
+        // 4. Cho phép kích hoạt Scene mới
+        asyncLoad.allowSceneActivation = true;
+
+        // Lưu ý: Ở Scene "World", bạn cần gọi ScreenFader.Instance.FadeIn() trong hàm Start 
+        // để màn hình sáng trở lại mượt mà.
     }
 
     public void ButtonNewGame()

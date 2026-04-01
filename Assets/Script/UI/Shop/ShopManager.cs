@@ -10,9 +10,10 @@ public class ShopManager : MonoBehaviour, IInteractable
     public string shopID;
     [SerializeField] private string shopDisplayName;
     [SerializeField] private Sprite shopIcon;
-    [SerializeField] private ItemType typeToSell;
+    //[SerializeField] private ItemType typeToSell;
+    [SerializeField] private List<ItemType> typesToSell = new List<ItemType>();
 
-    [Header("Visuals Ngoài Bản Đồ (Nếu cần)")]
+    [Header("Visuals")]
     public GameObject openVisual;
     public GameObject closeVisual;
 
@@ -26,8 +27,38 @@ public class ShopManager : MonoBehaviour, IInteractable
         if (string.IsNullOrEmpty(shopID)) shopID = GlobalHelper.GenerateUniqueID(gameObject);
         timeManager = FindAnyObjectByType<TimeManager>();
 
-        TimeManager.OnDateTimeChanged += CheckShopStatus;
-        CheckShopStatus(timeManager.GetCurrentDateTime());
+        if (timeManager != null)
+        {
+            isCurrentlyOpen = timeManager.GetCurrentDateTime().TimeToAllShopOpen();
+            UpdateShopVisuals(isCurrentlyOpen);
+        }
+    }
+
+    private void Update()
+    {
+        if (timeManager == null) return;
+
+        // Cập nhật trạng thái đóng mở ngay lập tức theo thời gian thực
+        bool isOpenNow = timeManager.GetCurrentDateTime().TimeToAllShopOpen();
+
+        if (isOpenNow != isCurrentlyOpen)
+        {
+            isCurrentlyOpen = isOpenNow;
+            UpdateShopVisuals(isCurrentlyOpen);
+
+            // Đuổi khách nếu tiệm đóng cửa khi đang mở UI
+            if (!isOpenNow && ShopUIDisplay.Instance != null && ShopUIDisplay.Instance.IsUIActive())
+            {
+                ShopUIDisplay.Instance.CloseShop();
+            }
+        }
+    }
+
+    private void UpdateShopVisuals(bool isOpen)
+    {
+        // Bật tắt GameObject biển hiệu
+        if (openVisual) openVisual.SetActive(isOpen);
+        if (closeVisual) closeVisual.SetActive(!isOpen);
     }
 
     private void OnDestroy() => TimeManager.OnDateTimeChanged -= CheckShopStatus;
@@ -57,11 +88,7 @@ public class ShopManager : MonoBehaviour, IInteractable
         if (isOpenNow != isCurrentlyOpen)
         {
             isCurrentlyOpen = isOpenNow;
-
-            // Bật tắt đèn của cái tiệm ngoài World
-            if (openVisual) openVisual.SetActive(isOpenNow);
-            if (closeVisual) closeVisual.SetActive(!isOpenNow);
-
+    
             // Nếu đang mở bảng UI mà tiệm đóng cửa 
             if (!isOpenNow && ShopUIDisplay.Instance != null)
             {
@@ -80,13 +107,21 @@ public class ShopManager : MonoBehaviour, IInteractable
         }
     }
 
+  
     private void RefreshStock()
     {
         currentStockList.Clear();
-        var validItems = ItemDictionary.Instance.itemPrefabs.Where(i => i.itemType == typeToSell);
+
+        // Lọc các item có trong từ điển mà thuộc bất kỳ loại nào trong danh sách typesToSell
+        var validItems = ItemDictionary.Instance.itemPrefabs.Where(i => typesToSell.Contains(i.itemType));
+
         foreach (var i in validItems)
         {
-            currentStockList.Add(new ItemStockData { itemName = i.itemName, stock = Random.Range(5, 15) });
+            currentStockList.Add(new ItemStockData
+            {
+                itemName = i.itemName,
+                stock = Random.Range(5, 15)
+            });
         }
     }
 

@@ -38,11 +38,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -1574272164268961109, guid: bf8923f519df7484eb1f87737072aa3b, type: 3}
       propertyPath: ID
-      value: 2
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: -1574272164268961109, guid: bf8923f519df7484eb1f87737072aa3b, type: 3}
       propertyPath: price
-      value: 600
+      value: 240
       objectReference: {fileID: 0}
     - target: {fileID: -1574272164268961109, guid: bf8923f519df7484eb1f87737072aa3b, type: 3}
       propertyPath: amountHP
@@ -59,6 +59,10 @@ PrefabInstance:
     - target: {fileID: -1574272164268961109, guid: bf8923f519df7484eb1f87737072aa3b, type: 3}
       propertyPath: itemName
       value: Coffee
+      objectReference: {fileID: 0}
+    - target: {fileID: -1574272164268961109, guid: bf8923f519df7484eb1f87737072aa3b, type: 3}
+      propertyPath: itemType
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: -339879578105206604, guid: bf8923f519df7484eb1f87737072aa3b, type: 3}
       propertyPath: m_Sprite

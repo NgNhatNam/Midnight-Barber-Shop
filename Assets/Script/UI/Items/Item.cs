@@ -49,70 +49,6 @@ public class Item : MonoBehaviour  //IPointerClickHandler
 
     }
 
-
-    /*
-   public void OnPointerClick(PointerEventData eventData)
-   {
-       bool isRightClick = eventData.button == PointerEventData.InputButton.Right;
-       bool isMobileTap = !eventData.dragging;
-
-       if (isRightClick || isMobileTap)
-       {
-           ItemUI.Instance.Show(this, eventData.position);
-       }
-
-       if (eventData.button == PointerEventData.InputButton.Right)
-       {
-           ItemUI.Instance.Show(this, eventData.position);
-       }
-    }*/
-
-    /*
-    public void OnPointerClick(PointerEventData eventData)
-    {
-        if (!eventData.dragging)
-        {
-            // 1. Tìm Slot cha đang chứa Item này
-            Slot parentSlot = GetComponentInParent<Slot>();
-
-            if (parentSlot != null)
-            {
-                // 2. Báo cho ToolbarController biết để Highlight ô này lên
-                ToolbarController toolbar = FindAnyObjectByType<ToolbarController>();
-                if (toolbar != null)
-                {
-                    toolbar.SelectSlot(parentSlot);
-                }
-            }
-
-            // 3. Hiện bảng Menu Use/Sell (giữ nguyên logic của bạn)
-            ItemUI.Instance.Show(this, eventData.position);
-        }
-    }
-
-
-    public void UseItem()
-    {
-        Debug.Log("Dùng item: " + itemData.ID);
-
-        playerHealth.Heal(itemData.amountHP);
-        playerHealth.HealMN(itemData.amountMN);
-        playerHealth.IncreaseStress(itemData.amountST);
-
-        Debug.Log("Máu: " + playerHealth.HP + "Mana: " + playerHealth.MN + "Stress: " + playerHealth.Stress );
-        RemoveFromInventory();
-    }
-
-    public void SellItem()
-    {
-        Debug.Log("Bán item: " + itemData.ID + " giá " + itemData.price);
-
-        playerHealth.AddGold(itemData.price);
-
-        RemoveFromInventory();
-    }
-    */
-
     public virtual void ShowPopUp()
     {
         Sprite itemIcon = GetComponent<Image>().sprite;
@@ -226,7 +162,7 @@ public class Item : MonoBehaviour  //IPointerClickHandler
         {
             player.Heal(amountHP);
             player.HealMN(amountMN);
-            player.DecreaseStress(amountST);
+            player.IncreaseStress(amountST);
             Debug.Log($"Đã ăn {itemName}, hồi {amountHP} HP");
         }
     }
@@ -251,5 +187,7 @@ public enum ItemType
     Tool,       // Công cụ: Kéo, lược, máy sấy...
     Furniture,   // Nội thất: Trang trí tiệm tóc
     Drink,
-    Fish
+    Fish,
+    Meat,
+    Egg
 }

@@ -11,8 +11,5 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/World.unity
     guid: 768129c38de948a43805aae07b8031cc
-  - enabled: 0
-    path: Assets/Scenes/HairCut.unity
-    guid: baa9b5b843927cf42bdf2b16af52892b
   m_configObjects: {}
   m_UseUCBPForAssetBundles: 0
