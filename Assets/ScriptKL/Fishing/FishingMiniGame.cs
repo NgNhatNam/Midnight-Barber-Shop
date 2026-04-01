@@ -18,7 +18,7 @@ public class FishingMiniGame : MonoBehaviour
     [Header("Physics (Base)")]
     public float gravity = 500f;
     public float liftForce = 600f;
-    private float fishSpeed; // Sẽ tính toán dựa trên giá cá
+    private float fishSpeed; 
 
     private float bobberPosition;
     private float bobberVelocity;
@@ -36,7 +36,7 @@ public class FishingMiniGame : MonoBehaviour
         health = FindAnyObjectByType<Health>();
     }
 
-    // --- HÀM QUAN TRỌNG: RANDOM CÁ VÀ TÍNH ĐỘ KHÓ ---
+    // --- RANDOM CÁ VÀ TÍNH ĐỘ KHÓ ---
     void OnEnable()
     {
         SetupRandomFish();
@@ -75,8 +75,8 @@ public class FishingMiniGame : MonoBehaviour
         
         switch (tier)
         {
-            case 1: baseHeight = 160f; minHeightInTier = 140f; break; // Khoảng 100-199
-            case 2: baseHeight = 140f; minHeightInTier = 120f; break; // Khoảng 200-299
+            case 1: baseHeight = 160f; minHeightInTier = 140f; break; 
+            case 2: baseHeight = 140f; minHeightInTier = 120f; break; 
             case 3: baseHeight = 120f; minHeightInTier = 100f; break;
             case 4: baseHeight = 100f; minHeightInTier = 90f; break;
             case 5: baseHeight = 90f; minHeightInTier = 80f; break;
@@ -109,7 +109,7 @@ public class FishingMiniGame : MonoBehaviour
         Debug.Log($"[Tier {tier}] Cá: {currentFishData.itemName} | Giá: {price} | Bobber Height: {targetHeight:F1}");
     }
 
-    // Thêm 2 biến tạm để lưu range đổi hướng
+    //  biến tạm để lưu range đổi hướng
     private float tempMinWait = 0.5f;
     private float tempMaxWait = 2f;
 
@@ -187,7 +187,6 @@ public class FishingMiniGame : MonoBehaviour
         health.Tired(staminaCost);
         health.AddExperience(expReward);
 
-        // SỬ DỤNG REWARDS CONTROLLER CỦA BẠN
         if (RewardsController.Instance != null)
         {
             RewardsController.Instance.GiveItemReward(currentFishID, 1);

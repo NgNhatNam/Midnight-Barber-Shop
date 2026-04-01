@@ -259,26 +259,23 @@ public class NPC : MonoBehaviour, IInteractable
             }
         }
 
-        // 4. Lọc câu thoại 
+        // Lọc câu thoại 
         activeLines = new List<DialogueLine>();
 
         foreach (var line in rawLines)
         {
-            if (questState == QuestState.Completed)
+            // Nếu có Quest đang xét trong cuộc hội thoại này
+            if (activeQuestInConversation != null)
             {
-                if (line.isCompletedLine) activeLines.Add(line);
+                if (questState == QuestState.Completed && line.isCompletedLine) activeLines.Add(line);
+                else if (questState == QuestState.InProgress && line.isInProgressLine) activeLines.Add(line);
+                else if (questState == QuestState.NotStarted && !line.isInProgressLine && !line.isCompletedLine) activeLines.Add(line);
             }
-            else if (questState == QuestState.InProgress)
+            else
             {
-                if (line.isInProgressLine) activeLines.Add(line);
-            }
-            else // NotStarted
-            {
-                // Chỉ lấy những câu không phải InProgress và không phải Completed
-                if (!line.isInProgressLine && !line.isCompletedLine) activeLines.Add(line);
+                activeLines.Add(line);
             }
         }
-
         if (activeLines.Count == 0) activeLines = rawLines;
         
         IsAnyNPCSpeaking = true; // Khóa hệ thống: Không ai được nói nữa
@@ -329,21 +326,20 @@ public class NPC : MonoBehaviour, IInteractable
         int currentLevel = playerHealth != null ? playerHealth.currentLevel : 1;
 
         activeQuestInConversation = null;
+        ConditionalDialogueGroup fallbackGroup = null;
 
-        if (dialogueData.conditionalGroups != null)
+        if (dialogueData.conditionalGroups != null && dialogueData.conditionalGroups.Count > 0)
         {
             foreach (var group in dialogueData.conditionalGroups)
             {
                 if (group.IsValid(now, currentLevel) && group.quest != null)
                 {
                     bool isQuestAlreadyDone = QuestController.Instance.IsQuestHandedIn(group.quest.questID);
-
                     if (!isQuestAlreadyDone)
                     {
                         activeQuestInConversation = group.quest;
                         return group.dialogueLines;
                     }
-                    Debug.Log($"Quest {group.quest.questID} đã xong, đang tìm Group tiếp theo...");
                 }
             }
 
@@ -353,20 +349,21 @@ public class NPC : MonoBehaviour, IInteractable
                 {
                     return group.dialogueLines;
                 }
+
+                if (fallbackGroup == null) fallbackGroup = group;
             }
         }
 
-        return null;
+        return fallbackGroup != null ? fallbackGroup.dialogueLines : null;
     }
-    
+
     void DisplayCurrentLine()
     {
         ClearChoices(); // Xóa các nút cũ trước khi hiện câu mới
 
         if (typingCoroutine != null) StopCoroutine(typingCoroutine);
         typingCoroutine = StartCoroutine(TypeLine());
-        //StopAllCoroutines();
-        //StartCoroutine(TypeLine());
+       
     }
 
     IEnumerator TypeLine()

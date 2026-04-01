@@ -21,6 +21,7 @@ public class QuestUI : MonoBehaviour
 
         UpdateQuestUI();
     }
+   
     public void UpdateQuestUI()
     {
         if (questListContent == null) return;
@@ -36,7 +37,6 @@ public class QuestUI : MonoBehaviour
 
             GameObject entry = Instantiate(questEntryPrefab, questListContent);
 
-            // Sử dụng cách tìm an toàn hơn
             TMP_Text questNameText = entry.transform.Find("QuestName")?.GetComponent<TMP_Text>();
             Transform objectiveList = entry.transform.Find("ObjectiveList");
 

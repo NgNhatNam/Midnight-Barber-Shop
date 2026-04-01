@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a85f33e7c008ee549b980456266d92b8, type: 3}
   m_Name: BaVy
   m_EditorClassIdentifier: Assembly-CSharp::NPCDialogie
-  npcName: "\u0110\u1EC9nh"
+  npcName: "B\xE1c \u0110\u1EC9nh"
   npcPortrait: {fileID: -1935192843410252236, guid: ff9aac40ac9ae2948a83a94a17480882, type: 3}
   typingSpeed: 0.05
   voidSound: {fileID: 8300000, guid: 70e42e5223f073443ad04edd67f46ceb, type: 3}
@@ -93,23 +93,7 @@ MonoBehaviour:
       autoProgress: 0
       isInProgressLine: 0
       isCompletedLine: 0
-      branchChoice:
-      - choices: "C\xF3 \u1EA1"
-        nextLines:
-        - text: "\xC1i ch\xE0 ch\xE0 th\u1EB1ng n\xE0y c\xF3 gu \u0111\u1EA5y"
-          autoProgress: 0
-          isInProgressLine: 0
-          isCompletedLine: 0
-          branchChoice: []
-        giveQuest: 0
-      - choices: "Kh\xF4ng \u1EA1"
-        nextLines:
-        - text: "Ch\xE0 th\u1EB1ng n\xE0y ch\u1EA3 c\xF3 gu t\xED n\xE0o"
-          autoProgress: 0
-          isInProgressLine: 0
-          isCompletedLine: 0
-          branchChoice: []
-        giveQuest: 0
+      branchChoice: []
   - description: Spring4
     minLevel: 0
     requiredSeason: 0
@@ -130,18 +114,272 @@ MonoBehaviour:
       autoProgress: 0
       isInProgressLine: 0
       isCompletedLine: 0
+      branchChoice: []
+  - description: Summer
+    minLevel: 0
+    requiredSeason: 1
+    startHour: 5
+    endHour: 11
+    startDate: 0
+    quest: {fileID: 0}
+    questDurationHours: 0
+    dialogueLines:
+    - text: "N\u1EAFng l\xEAn s\u1EDBm qu\xE1, b\xE1c ph\u1EA3i ra \u0111\u1ED3ng
+        t\u1EEB l\xFAc g\xE0 ch\u01B0a g\xE1y \u0111\xE2y."
+      autoProgress: 0
+      isInProgressLine: 0
+      isCompletedLine: 0
+      branchChoice: []
+    - text: "Con \u1EDF trong ti\u1EC7m nh\u1EDB b\u1EADt qu\u1EA1t cho kh\xE1ch,
+        \u0111\u1EEBng \u0111\u1EC3 ng\u01B0\u1EDDi ta n\xF3ng m\xE0 c\xE1u \u0111\u1EA5y"
+      autoProgress: 0
+      isInProgressLine: 0
+      isCompletedLine: 0
+      branchChoice: []
+  - description: Summer2
+    minLevel: 0
+    requiredSeason: 1
+    startHour: 11
+    endHour: 13
+    startDate: 0
+    quest: {fileID: 0}
+    questDurationHours: 0
+    dialogueLines:
+    - text: "Tr\u1EDDi n\xF3ng th\u1EBF n\xE0y ch\u1EC9 c\xF3 b\xE1t canh chua b\xE0
+        V\xE2n n\u1EA5u l\xE0 nh\u1EA5t th\xF4i"
+      autoProgress: 0
+      isInProgressLine: 0
+      isCompletedLine: 0
+      branchChoice: []
+    - text: "T\xED con ngh\u1EC9 tay th\xEC gh\xE9 qua nh\xE0 b\xE1c, b\xE1c \u0111\u1EC3
+        d\xE0nh cho con ly n\u01B0\u1EDBc v\u1ED1i \u0111\xE1 l\u1EA1nh."
+      autoProgress: 0
+      isInProgressLine: 0
+      isCompletedLine: 0
+      branchChoice: []
+  - description: Summer3
+    minLevel: 0
+    requiredSeason: 1
+    startHour: 13
+    endHour: 18
+    startDate: 0
+    quest: {fileID: 0}
+    questDurationHours: 0
+    dialogueLines:
+    - text: "C\xE1i Vy n\xF3 c\u1EE9 lo con l\xE0m vi\u1EC7c qu\xE1 s\u1EE9c d\u01B0\u1EDBi
+        c\xE1i n\u1EAFng n\xE0y."
+      autoProgress: 0
+      isInProgressLine: 0
+      isCompletedLine: 0
+      branchChoice: []
+    - text: "N\xF3 d\u1EB7n b\xE1c tr\xF4ng ch\u1EEBng con \u0111\u1EA5y."
+      autoProgress: 0
+      isInProgressLine: 0
+      isCompletedLine: 0
+      branchChoice: []
+  - description: Summer4
+    minLevel: 0
+    requiredSeason: 1
+    startHour: 18
+    endHour: 5
+    startDate: 0
+    quest: {fileID: 0}
+    questDurationHours: 0
+    dialogueLines:
+    - text: "Ti\u1EBFng ve k\xEAu nh\u1EE9c \u0111\u1EA7u qu\xE1."
+      autoProgress: 0
+      isInProgressLine: 0
+      isCompletedLine: 0
+      branchChoice: []
+    - text: "nh\u01B0ng \u0111\u01B0\u1EE3c c\xE1i gi\xF3 \u0111\u1ED3ng th\u1ED5i
+        v\xE0o c\u0169ng m\xE1t."
+      autoProgress: 0
+      isInProgressLine: 0
+      isCompletedLine: 0
+      branchChoice: []
+  - description: Autumn1
+    minLevel: 0
+    requiredSeason: 2
+    startHour: 5
+    endHour: 11
+    startDate: 0
+    quest: {fileID: 0}
+    questDurationHours: 0
+    dialogueLines:
+    - text: "S\u01B0\u01A1ng thu gi\u0103ng m\u1EDD c\u1EA3 ru\u1ED9ng l\xFAa r\u1ED3i."
+      autoProgress: 0
+      isInProgressLine: 0
+      isCompletedLine: 0
+      branchChoice: []
+    - text: "Nh\xECn c\u1EE9 nh\u01B0 ti\xEAn c\u1EA3nh \u1EA5y con nh\u1EC9."
+      autoProgress: 0
+      isInProgressLine: 0
+      isCompletedLine: 0
+      branchChoice: []
+  - description: Autumn2
+    minLevel: 0
+    requiredSeason: 2
+    startHour: 11
+    endHour: 13
+    startDate: 0
+    quest: {fileID: 0}
+    questDurationHours: 0
+    dialogueLines:
+    - text: "M\xF9a thu n\u1EAFng hanh qu\xE1, da d\u1EBB b\xE1c ch\xE1u m\xECnh
+        c\u1EE9 kh\xF4 kh\u1ED1c c\u1EA3 l\u1EA1i."
+      autoProgress: 0
+      isInProgressLine: 0
+      isCompletedLine: 0
+      branchChoice: []
+    - text: "Con Vy n\xF3 m\u1EDBi mua \xEDt h\u1ED3ng gi\xF2n, n\xF3 b\u1EA3o b\xE1c
+        mang sang cho con \u0103n cho nhu\u1EADn gi\u1ECDng."
+      autoProgress: 0
+      isInProgressLine: 0
+      isCompletedLine: 0
+      branchChoice: []
+  - description: Autumn3
+    minLevel: 0
+    requiredSeason: 2
+    startHour: 13
+    endHour: 18
+    startDate: 0
+    quest: {fileID: 0}
+    questDurationHours: 0
+    dialogueLines:
+    - text: "L\xE1 v\xE0ng r\u1EE5ng \u0111\u1EA7y s\xE2n b\xE1c qu\xE9t kh\xF4ng
+        xu\u1EC3."
+      autoProgress: 0
+      isInProgressLine: 0
+      isCompletedLine: 0
+      branchChoice: []
+    - text: "Nh\u01B0ng nh\xECn l\u1EA1i th\u1EA5y l\xE3ng m\u1EA1n."
+      autoProgress: 0
+      isInProgressLine: 0
+      isCompletedLine: 0
+      branchChoice: []
+  - description: Autumn4
+    minLevel: 0
+    requiredSeason: 2
+    startHour: 18
+    endHour: 5
+    startDate: 0
+    quest: {fileID: 0}
+    questDurationHours: 0
+    dialogueLines:
+    - text: "Con Vy n\xF3 c\u1EE9 ng\u1ED3i soi g\u01B0\u01A1ng mi\u1EBFt."
+      autoProgress: 0
+      isInProgressLine: 0
+      isCompletedLine: 0
+      branchChoice: []
+    - text: "Ch\u1EAFc l\xE0 \u0111ang ch\u1EDD \xF4ng th\u1EE3 c\u1EAFt t\xF3c sang
+        t\u01B0 v\u1EA5n ki\u1EC3u m\u1EDBi \u0111\xE2y."
+      autoProgress: 0
+      isInProgressLine: 0
+      isCompletedLine: 0
+      branchChoice: []
+  - description: Winter1
+    minLevel: 0
+    requiredSeason: 3
+    startHour: 5
+    endHour: 11
+    startDate: 0
+    quest: {fileID: 0}
+    questDurationHours: 0
+    dialogueLines:
+    - text: "Tr\u1EDDi l\u1EA1nh t\xEA t\xE1i, con nh\u1EDB m\u1EB7c cho \u1EA5m
+        v\xE0o \u0111\u1EA5y nh\xE1."
+      autoProgress: 0
+      isInProgressLine: 0
+      isCompletedLine: 0
+      branchChoice: []
+    - text: "K\u1EBBo vi\xEAm h\u1ECDng l\xE0 kh\xF4ng n\xF3i chuy\u1EC7n \u0111\u01B0\u1EE3c
+        v\u1EDBi kh\xE1ch \u0111\xE2u."
+      autoProgress: 0
+      isInProgressLine: 0
+      isCompletedLine: 0
+      branchChoice: []
+  - description: Winter2
+    minLevel: 0
+    requiredSeason: 3
+    startHour: 11
+    endHour: 13
+    startDate: 0
+    quest: {fileID: 0}
+    questDurationHours: 0
+    dialogueLines:
+    - text: "M\xF9a n\xE0y c\xE2y c\u1EA3nh ng\u1EE7 \u0111\xF4ng c\u1EA3 r\u1ED3i,
+        b\xE1c c\u0169ng r\u1EA3nh r\u1ED7i h\u01A1n h\u1EB3n."
+      autoProgress: 0
+      isInProgressLine: 0
+      isCompletedLine: 0
+      branchChoice: []
+    - text: "B\xE0 V\xE2n \u0111ang n\u1EA5u n\u1ED3i ng\xF4 lu\u1ED9c n\xF3ng h\u1ED5i
+        \u1EDF qu\xE1n \u0111\u1EA5y, con sang l\xE0m v\xE0i b\u1EAFp cho \u1EA5m
+        b\u1EE5ng."
+      autoProgress: 0
+      isInProgressLine: 0
+      isCompletedLine: 0
+      branchChoice: []
+  - description: Winter3
+    minLevel: 0
+    requiredSeason: 3
+    startHour: 13
+    endHour: 18
+    startDate: 0
+    quest: {fileID: 0}
+    questDurationHours: 0
+    dialogueLines:
+    - text: "Tr\u1EDDi ch\xF3ng t\u1ED1i th\u1EADt, m\u1EDBi \u0111\xF3 m\xE0 s\u01B0\u01A1ng
+        mu\u1ED1i \u0111\xE3 xu\u1ED1ng r\u1ED3i."
+      autoProgress: 0
+      isInProgressLine: 0
+      isCompletedLine: 0
+      branchChoice: []
+    - text: "Th\xF4i \u0111\xF3ng c\u1EEDa ti\u1EC7m s\u1EDBm \u0111i con, sang nh\xE0
+        b\xE1c l\xE0m n\u1ED3i l\u1EA9u cho \u1EA5m c\xFAng."
+      autoProgress: 0
+      isInProgressLine: 0
+      isCompletedLine: 0
+      branchChoice: []
+  - description: Winter4
+    minLevel: 0
+    requiredSeason: 3
+    startHour: 18
+    endHour: 5
+    startDate: 0
+    quest: {fileID: 0}
+    questDurationHours: 0
+    dialogueLines:
+    - text: "B\xEAn b\u1EBFp l\u1EEDa h\u1ED3ng m\xE0 k\u1EC3 chuy\u1EC7n ng\xE0y
+        x\u01B0a th\xEC ch\u1EB3ng c\xF2n g\xEC b\u1EB1ng."
+      autoProgress: 0
+      isInProgressLine: 0
+      isCompletedLine: 0
+      branchChoice: []
+    - text: "C\xE1i Vy n\xF3 v\u1EEBa \u0111an xong c\xE1i kh\u0103n len, kh\xF4ng
+        bi\u1EBFt n\xF3 \u0111\u1ECBnh t\u1EB7ng cho '\xF4ng t\u01B0\u1EDBng' n\xE0o
+        \u0111\xE2y nh\u1EC9?"
+      autoProgress: 0
+      isInProgressLine: 0
+      isCompletedLine: 0
       branchChoice:
-      - choices: "C\xF3 \u1EA1"
+      - choices: "Ch\u1EAFc cho anh T\u1EA5n \u0111\u1EA5y \u1EA1"
         nextLines:
-        - text: "\xC1i ch\xE0 ch\xE0 th\u1EB1ng n\xE0y c\xF3 gu \u0111\u1EA5y"
+        - text: "\xD4 c\xE1i th\u1EB1ng l\u01B0\u1EDDi \u0111\xF3 m\xE0 c\xF3 c\u1EEDa
+            \xE1"
+          autoProgress: 0
+          isInProgressLine: 0
+          isCompletedLine: 0
+          branchChoice: []
+        - text: "Kh\xF4ng c\xF3 chuy\u1EC7n \u0111\xF3 \u0111\xE2u"
           autoProgress: 0
           isInProgressLine: 0
           isCompletedLine: 0
           branchChoice: []
         giveQuest: 0
-      - choices: "Kh\xF4ng \u1EA1"
+      - choices: "Cho ch\xE1u th\xEC m\u1EDBi l\u1EA1 \u0111\xF3 \u1EA1"
         nextLines:
-        - text: "Ch\xE0 th\u1EB1ng n\xE0y ch\u1EA3 c\xF3 gu t\xED n\xE0o"
+        - text: "\xD4i th\u1EB1ng n\xE0y, l\u1EA1 tr\u01B0\u1EDBc quen sau."
           autoProgress: 0
           isInProgressLine: 0
           isCompletedLine: 0

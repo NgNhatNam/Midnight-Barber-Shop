@@ -10,8 +10,8 @@ public class AnimalStable : MonoBehaviour, IInteractable
     [Header("Setting")]
     public string stableName = "";
     public int maxCapacity = 5;
-    public Transform spawnPoint;    // Điểm xuất hiện con vật
-    public Collider2D boundary;     // Khu vực di chuyển (Gán vào moveArea của Animal)
+    public Transform spawnPoint;    
+    public Collider2D boundary;     
 
     [Header("Animal Prefab for Stable")]
     public List<GameObject> animalPrefabs;
@@ -23,7 +23,6 @@ public class AnimalStable : MonoBehaviour, IInteractable
 
     public void Interact()
     {
-        // Mở UI và truyền chính cái chuồng này vào để xử lý
         AnimalUIManager.Instance.OpenStableUI(this);
     }
 
@@ -40,7 +39,6 @@ public class AnimalStable : MonoBehaviour, IInteractable
         if (animalScript != null)
         {
             animalScript.moveArea = this.boundary;
-            // GÁN NGÀY SINH NGAY TẠI ĐÂY
             if (TimeManager.Instance != null)
             {
                 animalScript.birthDayTotal = TimeManager.Instance.GetCurrentDateTime().TotalNumDays;
@@ -70,7 +68,7 @@ public class AnimalStable : MonoBehaviour, IInteractable
         {
             data.animals.Add(new AnimalSaveData
             {
-                // Lưu tên prefab (Xóa chữ "(Clone)" nếu có)
+                // Lưu tên prefab
                 animalPrefabName = animal.gameObject.name.Replace("(Clone)", "").Trim(),
                 position = animal.transform.position,
                 birthDayTotal = animal.birthDayTotal, 

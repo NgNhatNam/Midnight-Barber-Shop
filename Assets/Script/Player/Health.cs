@@ -7,7 +7,6 @@ using UnityEngine.UI;
 public class Health : MonoBehaviour
 {
 
-    // Thêm vào class Health các biến này
     [Header("Statistics")]
     public int currentLevel = 1;
     public int currentEXP = 0;

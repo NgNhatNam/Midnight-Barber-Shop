@@ -1,0 +1,75 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a85f33e7c008ee549b980456266d92b8, type: 3}
+  m_Name: MeSa
+  m_EditorClassIdentifier: Assembly-CSharp::NPCDialogie
+  npcName: "B\xE1c H\u01B0\u01A1ng"
+  npcPortrait: {fileID: -888757864372014434, guid: bb1fd209cbeefb24ca8e0a31835458f7, type: 3}
+  typingSpeed: 0.05
+  voidSound: {fileID: 8300000, guid: 70e42e5223f073443ad04edd67f46ceb, type: 3}
+  voicePitch: 1
+  autoPorgressDelay: 1.5
+  conditionalGroups:
+  - description: 
+    minLevel: 0
+    requiredSeason: 0
+    startHour: 0
+    endHour: 0
+    startDate: 0
+    quest: {fileID: 0}
+    questDurationHours: 0
+    dialogueLines:
+    - text: "Ch\xE1u mua th\u1ECBt c\xE1 th\xEC c\u1EE9 qua qu\xE1n b\xE1c nh\xE9"
+      autoProgress: 0
+      isInProgressLine: 0
+      isCompletedLine: 0
+      branchChoice: []
+  - description: 
+    minLevel: 0
+    requiredSeason: 1
+    startHour: 0
+    endHour: 0
+    startDate: 0
+    quest: {fileID: 0}
+    questDurationHours: 0
+    dialogueLines:
+    - text: "Tr\u1EDDi n\xE0y n\xF3ng th\u1EADt ch\xE1u nh\u1EC9"
+      autoProgress: 0
+      isInProgressLine: 0
+      isCompletedLine: 0
+      branchChoice: []
+  - description: 
+    minLevel: 0
+    requiredSeason: 2
+    startHour: 0
+    endHour: 0
+    startDate: 0
+    quest: {fileID: 0}
+    questDurationHours: 0
+    dialogueLines:
+    - text: "M\xF9a thu \u0111i qua, tr\u1EA7m h\u01B0\u01A1ng g\u1ECDi b\xF3ng d\xE1ng
+        ng\u01B0\u1EDDi khu\u1EA5t xa"
+      autoProgress: 0
+      isInProgressLine: 0
+      isCompletedLine: 0
+      branchChoice: []
+    - text: "\u0110\xE3 l\u1EB7ng ti\u1EBFng d\u01B0\u01A1ng c\u1EA7m\r\nGi\xF3 mang
+        m\xF9a \u0111\xF4ng gh\xE9 l\u1EA1i"
+      autoProgress: 0
+      isInProgressLine: 0
+      isCompletedLine: 0
+      branchChoice: []
+    - text: "\u0110\u1EC3 c\xF4 \u0111\u01A1n x\xE9 n\xE1t tim ai\n"
+      autoProgress: 0
+      isInProgressLine: 0
+      isCompletedLine: 0
+      branchChoice: []

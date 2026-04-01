@@ -14,12 +14,205 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::NPCDialogie
   npcName: "T\u1EA5n"
   npcPortrait: {fileID: 21300000, guid: 8d2ead57c6b3a2248b22da9e9e758365, type: 3}
-  dialogueLines:
-  - Hello em trai
-  - "M\u1EDF qu\xE1n c\u1EAFt t\xF3c cho anh gi\xFAp anh nghen"
-  - Bye em trai
-  autoProgressLines: 010000
-  autoPorgressDelay: 1.5
   typingSpeed: 0.05
   voidSound: {fileID: 8300000, guid: 70e42e5223f073443ad04edd67f46ceb, type: 3}
   voicePitch: 1
+  autoPorgressDelay: 1.5
+  conditionalGroups:
+  - description: Spring1
+    minLevel: 0
+    requiredSeason: 0
+    startHour: 5
+    endHour: 9
+    startDate: 0
+    quest: {fileID: 0}
+    questDurationHours: 0
+    dialogueLines:
+    - text: "M\u01B0a xu\xE2n th\u1EBF n\xE0y n\u1EB1m ng\u1EE7 l\xE0 nh\u1EA5t."
+      autoProgress: 0
+      isInProgressLine: 0
+      isCompletedLine: 0
+      branchChoice: []
+    - text: "Ch\xFA em khai k\xE9o \u0111\u1EA7u n\u0103m cho anh nh\xE9."
+      autoProgress: 0
+      isInProgressLine: 0
+      isCompletedLine: 0
+      branchChoice: []
+  - description: Spring2
+    minLevel: 0
+    requiredSeason: 0
+    startHour: 9
+    endHour: 15
+    startDate: 0
+    quest: {fileID: 0}
+    questDurationHours: 0
+    dialogueLines:
+    - text: "Anh ra qu\xE1n con Sa l\xE0m h\u1EDBp tr\xE0 m\u1EA1n cho t\u1EC9nh
+        t\xE1o"
+      autoProgress: 0
+      isInProgressLine: 0
+      isCompletedLine: 0
+      branchChoice: []
+    - text: "Ch\xFA em \u1EDF l\u1EA1i tr\xF4ng qu\xE1n nh\xE1"
+      autoProgress: 0
+      isInProgressLine: 0
+      isCompletedLine: 0
+      branchChoice: []
+  - description: Spring3
+    minLevel: 0
+    requiredSeason: 0
+    startHour: 15
+    endHour: 18
+    startDate: 0
+    quest: {fileID: 0}
+    questDurationHours: 0
+    dialogueLines:
+    - text: "Gi\xF3 xu\xE2n th\u1ED5i m\xE1t r\u01B0\u1EE3i, anh th\u1EA5y h\u01A1i...
+        m\u1ECFi l\u01B0ng."
+      autoProgress: 0
+      isInProgressLine: 0
+      isCompletedLine: 0
+      branchChoice: []
+    - text: "Ch\u1EAFc ph\u1EA3i \u0111i n\u1EB1m t\xED :)))"
+      autoProgress: 0
+      isInProgressLine: 0
+      isCompletedLine: 0
+      branchChoice: []
+  - description: Spring4
+    minLevel: 0
+    requiredSeason: 0
+    startHour: 18
+    endHour: 5
+    startDate: 0
+    quest: {fileID: 0}
+    questDurationHours: 0
+    dialogueLines:
+    - text: "Anh ra qu\xE1n con Sa l\xE0m h\u1EDBp tr\xE0 m\u1EA1n cho t\u1EC9nh
+        t\xE1o"
+      autoProgress: 0
+      isInProgressLine: 0
+      isCompletedLine: 0
+      branchChoice: []
+    - text: "Tr\u1EDDi se l\u1EA1nh th\u1EBF n\xE0y ng\u1ED3i nh\xE2m nhi ch\xE9n
+        r\u01B0\u1EE3u n\u1EBFp l\xE0 nh\u1EA5t tr\u1EA7n \u0111\u1EDDi."
+      autoProgress: 0
+      isInProgressLine: 0
+      isCompletedLine: 0
+      branchChoice: []
+  - description: Quest1
+    minLevel: 6
+    requiredSeason: 0
+    startHour: 5
+    endHour: 0
+    startDate: 1
+    quest: {fileID: 11400000, guid: d61ef0b15bc8a4a4d9c03f09864ea81b, type: 2}
+    questDurationHours: 0
+    dialogueLines:
+    - text: "H\xF4m nay ch\xFA ph\u1EA3i c\u1EAFt cho anh 10 ng\u01B0\u1EDDi, \u0111\u01B0\u1EE3c
+        ch\u1EE9"
+      autoProgress: 0
+      isInProgressLine: 0
+      isCompletedLine: 0
+      branchChoice:
+      - choices: "\u0110\u01B0\u1EE3c \u1EA1"
+        nextLines: []
+        giveQuest: 1
+    - text: "Ch\xFA c\u1EE9 ti\u1EBFp t\u1EE5c c\xF4ng vi\u1EC7c \u0111i nh\xE1"
+      autoProgress: 0
+      isInProgressLine: 1
+      isCompletedLine: 0
+      branchChoice: []
+    - text: "Haha, th\u1EB1ng n\xE0y m\u1EDBi ng\xE0y \u0111\u1EA7u m\xE0 kh\xE1
+        \u0111\u1EA5y"
+      autoProgress: 0
+      isInProgressLine: 0
+      isCompletedLine: 1
+      branchChoice: []
+    - text: "Anh th\u01B0\u1EDFng cho m\u1ED9t \xEDt "
+      autoProgress: 0
+      isInProgressLine: 0
+      isCompletedLine: 1
+      branchChoice: []
+  - description: Quest2
+    minLevel: 3
+    requiredSeason: 0
+    startHour: 5
+    endHour: 0
+    startDate: 0
+    quest: {fileID: 11400000, guid: e6def8674e41d25448ca2a08f4221455, type: 2}
+    questDurationHours: 0
+    dialogueLines:
+    - text: "L\u1EA7n n\xE0y ch\xFA c\u1EAFt t\xF3c cho anh 20 ng\u01B0\u1EDDi, \u0111\u01B0\u1EE3c
+        ch\u1EE9"
+      autoProgress: 0
+      isInProgressLine: 0
+      isCompletedLine: 0
+      branchChoice:
+      - choices: "\u0110\u01B0\u1EE3c \u1EA1"
+        nextLines: []
+        giveQuest: 1
+    - text: "Ch\xFA c\u1EE9 ti\u1EBFp t\u1EE5c c\xF4ng vi\u1EC7c \u0111i nh\xE1"
+      autoProgress: 0
+      isInProgressLine: 1
+      isCompletedLine: 0
+      branchChoice: []
+    - text: "\u0110\u01B0\u1EE3c \u0111\u1EA5y, tay ngh\u1EC1 kh\xE1 h\u01A1n r\u1ED3i
+        \u0111\u1EA5y"
+      autoProgress: 0
+      isInProgressLine: 0
+      isCompletedLine: 1
+      branchChoice: []
+    - text: "\u0110\xE2y l\xE0 ti\u1EC1n th\u01B0\u1EDFng c\u1EE7a ch\xFA "
+      autoProgress: 0
+      isInProgressLine: 0
+      isCompletedLine: 1
+      branchChoice: []
+  - description: Quest3
+    minLevel: 0
+    requiredSeason: 0
+    startHour: 1
+    endHour: 0
+    startDate: 0
+    quest: {fileID: 11400000, guid: ed6b93fd2ccee7242ab607531a3c579e, type: 2}
+    questDurationHours: 0
+    dialogueLines:
+    - text: "Anh nh\u1EDD nh\xF3c c\xE1i n\xE0y"
+      autoProgress: 0
+      isInProgressLine: 0
+      isCompletedLine: 0
+      branchChoice:
+      - choices: "\u0110\u01B0\u1EE3c \u1EA1"
+        nextLines:
+        - text: "Nh\xF3c c\u1EAFt t\xF3c 30 ng\u01B0\u1EDDi cho anh nh\xE9"
+          autoProgress: 0
+          isInProgressLine: 0
+          isCompletedLine: 0
+          branchChoice: []
+        - text: "\xC0 nh\u1EDB c\u1EAFt bu\u1ED5i \u0111\xEAm n\u1EEFa"
+          autoProgress: 0
+          isInProgressLine: 0
+          isCompletedLine: 0
+          branchChoice: []
+        - text: "Anh n\xF3i tr\u01B0\u1EDBc l\xE0m \u0111\xEAm c\xF3 ng\xE0y g\u1EB7p
+            ma \u0111\u1EA5y, Ha Ha"
+          autoProgress: 0
+          isInProgressLine: 0
+          isCompletedLine: 0
+          branchChoice: []
+        giveQuest: 1
+    - text: "Ch\xFA c\u1EE9 ti\u1EBFp t\u1EE5c c\xF4ng vi\u1EC7c \u0111i nh\xE1"
+      autoProgress: 0
+      isInProgressLine: 1
+      isCompletedLine: 0
+      branchChoice: []
+    - text: "Kh\xE1 \u0111\u1EA5y ch\xFA \u0111\xE1ng \u0111\u01B0\u1EE3c anh m\xE0y
+        khen"
+      autoProgress: 0
+      isInProgressLine: 0
+      isCompletedLine: 1
+      branchChoice: []
+    - text: "\u0110\xE2y l\xE0 ti\u1EC1n th\u01B0\u1EDFng c\u1EE7a ch\xFA "
+      autoProgress: 0
+      isInProgressLine: 0
+      isCompletedLine: 1
+      branchChoice: []
