@@ -50,7 +50,20 @@ public class Animal : MonoBehaviour, IInteractable
 
     [Header("Economy Settings")]
     public int basePrice = 100; // Giá mua ban đầu
-    public float priceMultiplierPerDay = 1.1f; // Mỗi ngày tăng 10% giá trị
+    public float priceMultiplierPerDay = 0.1f; // Mỗi ngày tăng 10% giá trị
+
+    void Awake()
+    {
+        animator = GetComponent<Animator>();
+    }
+    public void Initialize(int birthDay, Collider2D area)
+    {
+        this.birthDayTotal = birthDay;
+        this.moveArea = area;
+
+        individualSpeed = moveSpeed * Random.Range(0.8f, 1.2f);
+        StartCoroutine(WanderRoutine());
+    }
 
     void Start()
     {
@@ -69,9 +82,8 @@ public class Animal : MonoBehaviour, IInteractable
             }
         }
 
-        // Tạo sự khác biệt về tốc độ (lệch khoảng 20%)
         individualSpeed = moveSpeed * Random.Range(0.8f, 1.2f);
-        // Tạo sự khác biệt về thời gian đứng yên
+        
         individualIdleTime = idleTime * Random.Range(0.7f, 1.5f);
 
 
@@ -90,13 +102,15 @@ public class Animal : MonoBehaviour, IInteractable
 
     public int GetSellPrice()
     {
+
         if (TimeManager.Instance == null) return basePrice;
 
         int currentDay = TimeManager.Instance.GetCurrentDateTime().TotalNumDays;
-        int daysAlive = currentDay - birthDayTotal;
 
-        // Công thức: Giá gốc * (Tỉ lệ ^ số ngày)
-        return Mathf.RoundToInt(basePrice * Mathf.Pow(priceMultiplierPerDay, daysAlive));
+        int daysAlive = Mathf.Max(0, currentDay - birthDayTotal);
+
+        float bonusValue = (basePrice * priceMultiplierPerDay) * daysAlive;
+        return Mathf.RoundToInt(basePrice + bonusValue);
     }
 
     IEnumerator WanderRoutine()
@@ -163,7 +177,6 @@ public class Animal : MonoBehaviour, IInteractable
         return potentialPos;
     }
 
-    // Logic chọn string animation dựa trên hướng
     void UpdateAnimationState(Vector2 dir, bool moving)
     {
         if (isEating) return;
@@ -183,7 +196,7 @@ public class Animal : MonoBehaviour, IInteractable
                 ChangeAnimationState(dir.y > 0 ? TOP_IDLE : BOTTOM_IDLE);
         }
     }
-    // Hàm đổi Anim chuẩn của bạn
+    
     void ChangeAnimationState(string newAnimation)
     {
         if (currentAnimation == newAnimation) return;
@@ -208,7 +221,7 @@ public class Animal : MonoBehaviour, IInteractable
     {
         if (TimeManager.Instance == null) return;
 
-        // Gọi hàm kiểm tra duy nhất
+       
         if (CanInteract())
         {
             if (RewardsController.Instance != null)
@@ -220,7 +233,6 @@ public class Animal : MonoBehaviour, IInteractable
         }
         else
         {
-            // Thông báo chung hoặc bạn có thể chi tiết hơn nếu muốn
             int daysAlive = TimeManager.Instance.GetCurrentDateTime().TotalNumDays - birthDayTotal;
             if (daysAlive < 5)
                 Debug.Log($"{animalName} chưa đủ 5 ngày tuổi để tạo sản phẩm!");

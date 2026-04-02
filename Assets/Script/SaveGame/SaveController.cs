@@ -192,6 +192,15 @@ public class SaveController : MonoBehaviour
             SaveData saveData = JsonUtility.FromJson<SaveData>(File.ReadAllText(saveLocation));
 
             ExecuteLoad(saveData);
+
+            await Task.Yield();
+
+            // Ép Cinemachine cập nhật vị trí ngay lập tức để tránh bị khựng 
+            var vcam = FindAnyObjectByType<CinemachineCamera>(); 
+            if (vcam != null)
+            {
+                vcam.ForceCameraPosition(saveData.playerPosition, Quaternion.identity);
+            }
         }
         else
         {
@@ -242,12 +251,35 @@ public class SaveController : MonoBehaviour
     }
     private void ExecuteLoad(SaveData saveData)
     {
+
+        // Tìm Confiner và Player
+        var confiner = FindAnyObjectByType<CinemachineConfiner2D>();
+        var player = GameObject.FindGameObjectWithTag("Player");
+        var vcam = FindAnyObjectByType<CinemachineCamera>();
+
+        // Tìm đúng Map Bound theo tên và Layer (Gọn hơn)
+        GameObject actualMap = GameObject.FindObjectsByType<GameObject>(FindObjectsSortMode.None)
+            .FirstOrDefault(obj => obj.name == saveData.mapBoundary && obj.layer == LayerMask.NameToLayer("MapBound"));
+
+        if (actualMap != null && confiner != null)
+        {
+            confiner.BoundingShape2D = actualMap.GetComponent<BoxCollider2D>();
+            confiner.InvalidateBoundingShapeCache();
+        }
+
+        // Dịch chuyển Player & Warp Camera
+        if (player != null)
+        {
+            player.transform.position = saveData.playerPosition;
+
+            if (vcam != null)
+                vcam.OnTargetObjectWarped(player.transform, saveData.playerPosition - vcam.transform.position);
+        }
+
         // Player Position
-        GameObject.FindGameObjectWithTag("Player").transform.position = saveData.playerPosition;
-
+        // GameObject.FindGameObjectWithTag("Player").transform.position = saveData.playerPosition;
         // Player Camera
-
-        FindAnyObjectByType<CinemachineConfiner2D>().BoundingShape2D = GameObject.Find(saveData.mapBoundary).GetComponent<BoxCollider2D>();
+        //FindAnyObjectByType<CinemachineConfiner2D>().BoundingShape2D = GameObject.Find(saveData.mapBoundary).GetComponent<BoxCollider2D>();
 
         // Player Inventory
         inventoryController.SetInventoryItems(saveData.inventorySaveData);

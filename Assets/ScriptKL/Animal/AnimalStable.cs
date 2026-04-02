@@ -80,23 +80,19 @@ public class AnimalStable : MonoBehaviour, IInteractable
 
     public void LoadStableSaveData(StableSaveData data)
     {
-        // Xóa hết gia súc cũ đang có trong scene trước khi load
-        foreach (Animal a in spawnedAnimals) Destroy(a.gameObject);
-        spawnedAnimals.Clear();
 
         foreach (var aData in data.animals)
         {
-            // Tìm prefab tương ứng trong list animalPrefabs dựa trên tên đã lưu
             GameObject prefab = animalPrefabs.Find(p => p.name == aData.animalPrefabName);
             if (prefab != null)
             {
                 GameObject newObj = Instantiate(prefab, aData.position, Quaternion.identity);
                 Animal animalScript = newObj.GetComponent<Animal>();
 
-                // Khôi phục trạng thái
-                animalScript.moveArea = this.boundary;
+                // GÁN DỮ LIỆU NGAY 
                 animalScript.birthDayTotal = aData.birthDayTotal;
                 animalScript.lastHarvestTotalDays = aData.lastHarvestTotalDays;
+                animalScript.moveArea = this.boundary;
 
                 spawnedAnimals.Add(animalScript);
             }

@@ -105,7 +105,7 @@ MonoBehaviour:
   wanderRadius: 4
   lastHarvestTotalDays: -999
   basePrice: 560
-  priceMultiplierPerDay: 0.2
+  priceMultiplierPerDay: 0.1
 --- !u!58 &7578094650046537389
 CircleCollider2D:
   m_ObjectHideFlags: 0

@@ -141,4 +141,4 @@ MonoBehaviour:
   wanderRadius: 4
   lastHarvestTotalDays: -999
   basePrice: 1500
-  priceMultiplierPerDay: 1.1
+  priceMultiplierPerDay: 0.2
