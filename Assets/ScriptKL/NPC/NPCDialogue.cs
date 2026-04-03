@@ -58,7 +58,8 @@ public class ConditionalDialogueGroup
     public int startDate = 1; // Ngày bắt đầu trong tháng (1-28)
 
     [Header("Quest Content")]
-    public Quest quest; 
+    public Quest quest;
+    public Quest prerequisiteQuest;
     public int questDurationHours = 24; // Thời hạn hoàn thành
 
     [Header("Dialogue Content")]
@@ -80,6 +81,12 @@ public class ConditionalDialogueGroup
         {
             if (now.Hour < startHour && now.Hour > endHour) return false;
         }
+        
+        if (prerequisiteQuest != null && !QuestController.Instance.IsQuestHandedIn(prerequisiteQuest.questID))
+        {
+            return false;
+        }
+       
 
         return true;
     }

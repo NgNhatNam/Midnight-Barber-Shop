@@ -240,49 +240,56 @@ public class NPC : MonoBehaviour, IInteractable
         StartDialogue();
     }
 
+    // Sửa
     void StartDialogue()
     {
-        List<DialogueLine> rawLines = GetCurrentDialogueLines();
-        if (rawLines == null) { EndDialogue(); return; }
+        // Tìm quest đã hoàn thành
+        Quest progressQuest = null;
+        foreach (var group in dialogueData.conditionalGroups)
+        {
+            if (group.quest != null && QuestController.Instance.IsQuestActive(group.quest.questID)
+                && QuestController.Instance.IsQuestCompleted(group.quest.questID))
+            {
+                progressQuest = group.quest;
+                break; 
+            }
+        }
+
+        // Nếu không có quest nào xong, thì mới tìm quest đang làm dở hoặc quest mới
+        if (progressQuest == null)
+        {
+            activeLines = GetCurrentDialogueLines(); //lấy theo logic ưu tiên thông thường
+        }
+        else
+        {
+            // Nếu có quest xong
+            activeQuestInConversation = progressQuest;
+            activeLines = GetCurrentDialogueLines();
+        }
+
+        if (activeLines == null) { EndDialogue(); return; }
 
         SyncQuestState();
 
+        // Trả thưởng nếu đã hoàn thành
         if (activeQuestInConversation != null)
         {
             string qID = activeQuestInConversation.questID;
-            if (QuestController.Instance.IsQuestActive(qID) && QuestController.Instance.IsQuestCompleted(qID))
+            if (QuestController.Instance.IsQuestCompleted(qID) && !QuestController.Instance.IsQuestHandedIn(qID))
             {
                 HandleQuestCompletion(activeQuestInConversation);
-
                 QuestController.Instance.HandInQuest(qID);
-                questState = QuestState.Completed; // Cập nhật ngay để lọc câu thoại bên dưới
+                questState = QuestState.Completed;
+
+                activeLines = GetCurrentDialogueLines();
             }
         }
-
-        // Lọc câu thoại 
-        activeLines = new List<DialogueLine>();
-
-        foreach (var line in rawLines)
-        {
-            // Nếu có Quest đang xét trong cuộc hội thoại này
-            if (activeQuestInConversation != null)
-            {
-                if (questState == QuestState.Completed && line.isCompletedLine) activeLines.Add(line);
-                else if (questState == QuestState.InProgress && line.isInProgressLine) activeLines.Add(line);
-                else if (questState == QuestState.NotStarted && !line.isInProgressLine && !line.isCompletedLine) activeLines.Add(line);
-            }
-            else
-            {
-                activeLines.Add(line);
-            }
-        }
-        if (activeLines.Count == 0) activeLines = rawLines;
         
-        IsAnyNPCSpeaking = true; // Khóa hệ thống: Không ai được nói nữa
+        IsAnyNPCSpeaking = true; 
         isThisNPCSpeaking = true;
 
 
-        dialogueIndex = 0;
+        dialogueIndex = GetStartingDialogueIndex();
         nameText.SetText(dialogueData.npcName);
         portraitImage.sprite = dialogueData.npcPortrait;
         dialoguePanel.SetActive(true);
@@ -290,6 +297,26 @@ public class NPC : MonoBehaviour, IInteractable
         FacePlayer();
         //Time.timeScale = 0f;
         DisplayCurrentLine();
+    }
+
+    // Thêm
+    private int GetStartingDialogueIndex()
+    {
+        if (activeLines == null || activeLines.Count == 0) return 0;
+
+        for (int i = 0; i < activeLines.Count; i++)
+        {
+            if (questState == QuestState.InProgress && activeLines[i].isInProgressLine)
+            {
+                return i;
+            }
+            if (questState == QuestState.Completed && activeLines[i].isCompletedLine)
+            {
+                return i;
+            }
+        }
+
+        return 0;
     }
 
     private void SyncQuestState()
@@ -318,6 +345,7 @@ public class NPC : MonoBehaviour, IInteractable
         }
     }
 
+
     private List<DialogueLine> GetCurrentDialogueLines()
     {
         if (dialogueData == null || timeManager == null) return null;
@@ -326,36 +354,58 @@ public class NPC : MonoBehaviour, IInteractable
         int currentLevel = playerHealth != null ? playerHealth.currentLevel : 1;
 
         activeQuestInConversation = null;
-        ConditionalDialogueGroup fallbackGroup = null;
 
-        if (dialogueData.conditionalGroups != null && dialogueData.conditionalGroups.Count > 0)
+        // --- BƯỚC 1: ƯU TIÊN QUEST ĐANG LÀM (IN PROGRESS) ---
+        // Duyệt danh sách để xem Player có đang giữ Quest nào của NPC này không.
+        // Nếu có, tập trung vào Quest đó, không quan tâm các Quest mới khác.
+        foreach (var group in dialogueData.conditionalGroups)
         {
-            foreach (var group in dialogueData.conditionalGroups)
+            if (group.quest != null && group.IsValid(now, currentLevel))
             {
-                if (group.IsValid(now, currentLevel) && group.quest != null)
+                if (QuestController.Instance.IsQuestActive(group.quest.questID))
                 {
-                    bool isQuestAlreadyDone = QuestController.Instance.IsQuestHandedIn(group.quest.questID);
-                    if (!isQuestAlreadyDone)
-                    {
-                        activeQuestInConversation = group.quest;
-                        return group.dialogueLines;
-                    }
+                    activeQuestInConversation = group.quest;
+                    return group.dialogueLines; // Trả về ngay lập tức
                 }
-            }
-
-            foreach (var group in dialogueData.conditionalGroups)
-            {
-                if (group.IsValid(now, currentLevel) && group.quest == null)
-                {
-                    return group.dialogueLines;
-                }
-
-                if (fallbackGroup == null) fallbackGroup = group;
             }
         }
 
-        return fallbackGroup != null ? fallbackGroup.dialogueLines : null;
-    }
+        // --- BƯỚC 2: TÌM QUEST MỚI (CHỈ CHẠY KHI KHÔNG CÓ QUEST ĐANG LÀM) ---
+        // Vòng lặp foreach sẽ tự động chạy từ trên xuống dưới (từ Element 0).
+        // Quest nào thỏa mãn IsValid đầu tiên sẽ được chọn -> Đúng ý đồ ưu tiên Element trước.
+        foreach (var group in dialogueData.conditionalGroups)
+        {
+            if (group.quest != null && group.IsValid(now, currentLevel))
+            {
+                string qID = group.quest.questID;
+                // Điều kiện: Chưa nhận (Active) và chưa hoàn thành trả thưởng xong (HandedIn)
+                if (!QuestController.Instance.IsQuestActive(qID) && !QuestController.Instance.IsQuestHandedIn(qID))
+                {
+                    activeQuestInConversation = group.quest;
+                    return group.dialogueLines; // Lấy Quest đầu tiên tìm thấy và thoát hàm
+                }
+            }
+        }
+
+        // --- BƯỚC 3: HỘI THOẠI THÔNG THƯỜNG ---
+        // Nếu không có Quest nào (cũ hay mới), NPC mới nói chuyện phiếm theo điều kiện.
+        foreach (var group in dialogueData.conditionalGroups)
+        {
+            if (group.quest == null && group.IsValid(now, currentLevel))
+            {
+                return group.dialogueLines;
+            }
+        }
+
+        // --- BƯỚC 4: DỰ PHÒNG (FALLBACK) ---
+        // Nếu tất cả các điều kiện trên đều không khớp, lấy Element đầu tiên làm mặc định.
+        if (dialogueData.conditionalGroups.Count > 0)
+        {
+            return dialogueData.conditionalGroups[0].dialogueLines;
+        }
+
+        return null;
+    }   
 
     void DisplayCurrentLine()
     {
@@ -389,11 +439,11 @@ public class NPC : MonoBehaviour, IInteractable
         }
     }
 
+    //Sửa
     void NextLine()
     {
         if (isTyping)
         {
-            // Thay vì chỉ hiện chữ, ta dừng gõ và chuẩn bị cho lần bấm sau ngay lập tức
             StopCoroutine(typingCoroutine);
             dialogueText.SetText(activeLines[dialogueIndex].text);
             isTyping = false;
@@ -407,11 +457,23 @@ public class NPC : MonoBehaviour, IInteractable
 
         if (dialogueIndex < activeLines.Count)
         {
+            if (questState == QuestState.InProgress && activeLines[dialogueIndex].isCompletedLine)
+            {
+                EndDialogue();
+                return;
+            }
+
+            if (questState == QuestState.NotStarted && activeLines[dialogueIndex].isInProgressLine)
+            {
+                EndDialogue();
+                return;
+            }
+
             DisplayCurrentLine();
         }
         else
         {
-            EndDialogue(); // Kết thúc nhanh
+            EndDialogue();
         }
     }
 
@@ -434,34 +496,36 @@ public class NPC : MonoBehaviour, IInteractable
             }
         }
     }
-    
+
     private void OnChoiceClicked(DialogueChoice selectedChoice)
     {
         if (selectedChoice.giveQuest && activeQuestInConversation != null)
         {
-            int duration = 24; // Mặc định
-
-            // Tìm duration từ group tương ứng với activeQuestInConversation
-            if (dialogueData.conditionalGroups != null)
+            // Kiểm tra xem quest đã được nhận chưa để tránh nhận đè
+            if (!QuestController.Instance.IsQuestActive(activeQuestInConversation.questID))
             {
-                foreach (var group in dialogueData.conditionalGroups)
+                int duration = 24;
+                if (dialogueData.conditionalGroups != null)
                 {
-                    if (group.quest == activeQuestInConversation)
+                    foreach (var group in dialogueData.conditionalGroups)
                     {
-                        duration = group.questDurationHours;
-                        break;
+                        if (group.quest == activeQuestInConversation)
+                        {
+                            duration = group.questDurationHours;
+                            break;
+                        }
                     }
                 }
+
+                var time = timeManager.GetCurrentDateTime();
+                QuestController.Instance.AcceptQuest(activeQuestInConversation, (int)time.TotalNumHours, duration);
+
+                // Cập nhật lại trạng thái Quest 
+                SyncQuestState();
             }
-
-            var time = timeManager.GetCurrentDateTime();
-            // SỬA TẠI ĐÂY: Dùng activeQuestInConversation và ép kiểu chuẩn
-            QuestController.Instance.AcceptQuest(activeQuestInConversation, (int)time.TotalNumHours, duration);
-
-            SyncQuestState();
         }
 
-        // Chuyển sang các dòng thoại tiếp theo trong Choice (nếu có)
+        // Chuyển sang các dòng thoại tiếp theo của Choice
         if (selectedChoice.nextLines != null && selectedChoice.nextLines.Count > 0)
         {
             activeLines = selectedChoice.nextLines;
@@ -474,7 +538,7 @@ public class NPC : MonoBehaviour, IInteractable
             EndDialogue();
         }
     }
-    
+
     public void EndDialogue()
     {
 

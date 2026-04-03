@@ -97,13 +97,11 @@ public class QuestController : MonoBehaviour
 
         QuestProgress targetQuest = null;
 
-        // Sử dụng vòng lặp thay vì Find để kiểm soát Null từng bước
         for (int i = 0; i < activateQuests.Count; i++)
         {
             var qp = activateQuests[i];
             if (qp == null) continue;
 
-            // KIỂM TRA QUAN TRỌNG: Phải chắc chắn qp.quest không null trước khi lấy QuestID
             if (qp.quest != null && qp.QuestID == questID)
             {
                 targetQuest = qp;
@@ -142,9 +140,7 @@ public class QuestController : MonoBehaviour
             {
                 if (objective.type == ObjectiveType.ServeCustomer)
                 {
-                    // KIỂM TRA ID Ở ĐÂY:
-                    // Nếu ID trong Quest để trống -> Tính cho tất cả khách
-                    // Nếu ID có giá trị -> Phải trùng với loại khách vừa cắt (customerType)
+                    
                     if (string.IsNullOrEmpty(objective.objectiveID) || objective.objectiveID == customerType)
                     {
                         if (objective.currentAmount < objective.requiredAmount)
@@ -162,26 +158,24 @@ public class QuestController : MonoBehaviour
     {
         if (quest == null || quest.objectives == null) return false;
 
-        Dictionary<int, int> itemsToRemove = new Dictionary<int, int>();
+        bool hasItemToCollect = quest.objectives.Exists(o => o.type == ObjectiveType.CollectItem);
 
+        if (!hasItemToCollect) return true;
+
+        Dictionary<int, int> itemsToRemove = new Dictionary<int, int>();
         foreach (var obj in quest.objectives)
         {
-            if (obj == null) continue;
-
             if (obj.type == ObjectiveType.CollectItem && int.TryParse(obj.objectiveID, out int id))
             {
                 itemsToRemove[id] = obj.requiredAmount;
             }
         }
 
-        // Thực hiện xóa thực tế
         foreach (var item in itemsToRemove)
         {
-            if (InventoryController.Instance != null)
-            {
-                InventoryController.Instance.RemoveItemsFromInventory(item.Key, item.Value);
-            }
+            InventoryController.Instance.RemoveItemsFromInventory(item.Key, item.Value);
         }
+
         return true;
     }
 

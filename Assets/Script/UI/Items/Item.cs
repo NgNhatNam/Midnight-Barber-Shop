@@ -109,9 +109,7 @@ public class Item : MonoBehaviour  //IPointerClickHandler
         {
             Consume(1);
         }
-        // Xóa vật phẩm sau khi dùng (nếu là đồ ăn/hạt giống)
-        //if (itemType != ItemType.Tool) Destroy(gameObject);
-        //if (itemType != ItemType.Seed) Destroy(gameObject);
+        
 
     }
 
@@ -136,7 +134,7 @@ public class Item : MonoBehaviour  //IPointerClickHandler
             UpdateQuantityDisplay();
         }
 
-        // CỰC KỲ QUAN TRỌNG: Cập nhật lại "sổ tay" Inventory để Quest nhận diện được
+        //  Cập nhật lại "sổ tay" Inventory để Quest nhận diện được
         if (InventoryController.Instance != null)
         {
             InventoryController.Instance.RebuildItemCounts();
@@ -146,13 +144,41 @@ public class Item : MonoBehaviour  //IPointerClickHandler
     public void SellItem()
     {
         Health player = FindAnyObjectByType<Health>();
-        if (player != null)
+        if (player == null) return;
+
+        float checkRadius = 2.0f; 
+        LayerMask shopLayer = LayerMask.GetMask("Shop"); 
+        Collider2D hit = Physics2D.OverlapCircle(player.transform.position, checkRadius, shopLayer);
+
+        float sellMultiplier = 0.2f; 
+
+        if (hit != null)
         {
-            player.AddGold(price); // Giả sử bạn có hàm AddGold trong Health
-            Debug.Log($"Đã bán {itemName} lấy {price} vàng");
-            //Destroy(gameObject);
-            Consume(1);
+            ShopManager shop = hit.GetComponent<ShopManager>();
+            if (shop != null)
+            {
+                if (shop.WillBuyItem(this.itemType))
+                {
+                    sellMultiplier = 0.8f; 
+                    Debug.Log($"{itemName} bán đúng nơi ({shop.name})! Được 80% giá.");
+                }
+                else
+                {
+                    sellMultiplier = 0.2f; 
+                    Debug.Log($"{shop.name} không chuyên về {itemType}. Bị ép giá xuống 20%!");
+                }
+            }
         }
+        else
+        {
+            sellMultiplier = 0.3f;
+            Debug.Log("Bán dạo: 30% giá.");
+        }
+
+        int finalPrice = Mathf.RoundToInt(price * sellMultiplier);
+        player.AddGold(finalPrice);
+
+        Consume(1);
     }
 
     private void EatFood()
@@ -170,13 +196,11 @@ public class Item : MonoBehaviour  //IPointerClickHandler
     private void PlantSeed()
     {
         Debug.Log($"Đã gieo hạt: {itemName}. Hành động: {specialAction}");
-        // Logic gieo hạt của bạn ở đây
     }
 
     private void EquipTool()
     {
         Debug.Log($"Đang sử dụng công cụ: {itemName}");
-        // Logic cầm kéo, cầm lược ở đây
     }
 
 }

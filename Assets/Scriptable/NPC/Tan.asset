@@ -26,6 +26,7 @@ MonoBehaviour:
     endHour: 9
     startDate: 0
     quest: {fileID: 0}
+    prerequisiteQuest: {fileID: 0}
     questDurationHours: 0
     dialogueLines:
     - text: "M\u01B0a xu\xE2n th\u1EBF n\xE0y n\u1EB1m ng\u1EE7 l\xE0 nh\u1EA5t."
@@ -45,6 +46,7 @@ MonoBehaviour:
     endHour: 15
     startDate: 0
     quest: {fileID: 0}
+    prerequisiteQuest: {fileID: 0}
     questDurationHours: 0
     dialogueLines:
     - text: "Anh ra qu\xE1n con Sa l\xE0m h\u1EDBp tr\xE0 m\u1EA1n cho t\u1EC9nh
@@ -65,6 +67,7 @@ MonoBehaviour:
     endHour: 18
     startDate: 0
     quest: {fileID: 0}
+    prerequisiteQuest: {fileID: 0}
     questDurationHours: 0
     dialogueLines:
     - text: "Gi\xF3 xu\xE2n th\u1ED5i m\xE1t r\u01B0\u1EE3i, anh th\u1EA5y h\u01A1i...
@@ -85,6 +88,7 @@ MonoBehaviour:
     endHour: 5
     startDate: 0
     quest: {fileID: 0}
+    prerequisiteQuest: {fileID: 0}
     questDurationHours: 0
     dialogueLines:
     - text: "Anh ra qu\xE1n con Sa l\xE0m h\u1EDBp tr\xE0 m\u1EA1n cho t\u1EC9nh
@@ -100,12 +104,13 @@ MonoBehaviour:
       isCompletedLine: 0
       branchChoice: []
   - description: Quest1
-    minLevel: 6
+    minLevel: 0
     requiredSeason: 0
     startHour: 5
     endHour: 0
     startDate: 1
     quest: {fileID: 11400000, guid: d61ef0b15bc8a4a4d9c03f09864ea81b, type: 2}
+    prerequisiteQuest: {fileID: 0}
     questDurationHours: 0
     dialogueLines:
     - text: "H\xF4m nay ch\xFA ph\u1EA3i c\u1EAFt cho anh 10 ng\u01B0\u1EDDi, \u0111\u01B0\u1EE3c
@@ -115,7 +120,12 @@ MonoBehaviour:
       isCompletedLine: 0
       branchChoice:
       - choices: "\u0110\u01B0\u1EE3c \u1EA1"
-        nextLines: []
+        nextLines:
+        - text: "Oke v\u1EADy ch\xFA b\u1EAFt \u0111\u1EA7u \u0111i nh\xE1"
+          autoProgress: 0
+          isInProgressLine: 0
+          isCompletedLine: 0
+          branchChoice: []
         giveQuest: 1
     - text: "Ch\xFA c\u1EE9 ti\u1EBFp t\u1EE5c c\xF4ng vi\u1EC7c \u0111i nh\xE1"
       autoProgress: 0
@@ -140,6 +150,7 @@ MonoBehaviour:
     endHour: 0
     startDate: 0
     quest: {fileID: 11400000, guid: e6def8674e41d25448ca2a08f4221455, type: 2}
+    prerequisiteQuest: {fileID: 0}
     questDurationHours: 0
     dialogueLines:
     - text: "L\u1EA7n n\xE0y ch\xFA c\u1EAFt t\xF3c cho anh 20 ng\u01B0\u1EDDi, \u0111\u01B0\u1EE3c
@@ -174,6 +185,7 @@ MonoBehaviour:
     endHour: 0
     startDate: 0
     quest: {fileID: 11400000, guid: ed6b93fd2ccee7242ab607531a3c579e, type: 2}
+    prerequisiteQuest: {fileID: 0}
     questDurationHours: 0
     dialogueLines:
     - text: "Anh nh\u1EDD nh\xF3c c\xE1i n\xE0y"
