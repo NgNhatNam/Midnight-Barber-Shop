@@ -21,12 +21,10 @@ public class MapTransation : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        // 1. Nếu là Player: Có Fade Transition
         if (collision.CompareTag("Player"))
         {
             FadeTransition(collision.gameObject);
         }
-        // 2. Nếu là NPC: Dịch chuyển ngay lập tức (Warp) để không lỗi NavMesh
         else if (collision.CompareTag("NPC"))
         {
             HandleNPCTransition(collision.gameObject);
@@ -48,9 +46,9 @@ public class MapTransation : MonoBehaviour
 
     private void HandleNPCTransition(GameObject npcGO)
     {
-        UpdatePosition(npcGO); // Warp ở đây
+        UpdatePosition(npcGO); 
 
-        // Gọi lệnh cập nhật lại đường đi cho NPC
+        // cập nhật lại đường đi cho NPC
         NPC npcScript = npcGO.GetComponent<NPC>();
         if (npcScript != null)
         {
@@ -92,7 +90,7 @@ public class MapTransation : MonoBehaviour
         NavMeshAgent agent = entity.GetComponent<NavMeshAgent>();
         if (agent != null && agent.isActiveAndEnabled)
         {
-            agent.Warp(targetPos); // Đây là lệnh quan trọng nhất cho NPC
+            agent.Warp(targetPos); 
         }
         else
         {

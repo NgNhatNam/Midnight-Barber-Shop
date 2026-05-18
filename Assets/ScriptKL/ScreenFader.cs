@@ -1,4 +1,4 @@
-﻿using System.Threading.Tasks;
+using System.Threading.Tasks;
 using UnityEngine;
 
 public class ScreenFader : MonoBehaviour
@@ -14,13 +14,18 @@ public class ScreenFader : MonoBehaviour
         if(Instance == null) 
         { 
             Instance = this;
-            //DontDestroyOnLoad(gameObject);
         }
-        //else Destroy(gameObject);
+    }
+
+    public void SetAlpha(float alpha)
+    {
+        if (canvasGroup != null) canvasGroup.alpha = alpha;
     }
 
     async Task Fade(float targetTransparency)
     {
+        if (Mathf.Abs(canvasGroup.alpha - targetTransparency) < 0.01f) return;
+        
         float start = canvasGroup.alpha, t = 0;
         while(t < fadeDuration)
         {

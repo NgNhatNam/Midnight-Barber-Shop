@@ -16,19 +16,17 @@ public class ItemPrice : MonoBehaviour, IPointerClickHandler
     public int currentStock;
     public TMP_Text stockText;
 
-    private Item itemData; // dữ liệu item 
+    private Item itemData;
     private InventoryController inventory;
     private Health playerHealth;
 
     public void Setup(Item selectedItem, int amount)
     {
-        // Gán trực tiếp data từ Manager truyền qua, không cần Instantiate ngẫu nhiên ở đây nữa
         itemData = selectedItem;
 
         inventory = FindFirstObjectByType<InventoryController>();
         playerHealth = FindAnyObjectByType<Health>();
 
-        // Trong ItemPrice.cs, hàm Setup
         if (itemData.icon != null)
         {
             iconImg.sprite = itemData.icon;
@@ -61,7 +59,6 @@ public class ItemPrice : MonoBehaviour, IPointerClickHandler
         if (stockText != null) stockText.text = "" + currentStock;
     }
 
-    // Chuột phải mở menu Shop
     public void OnPointerClick(PointerEventData eventData)
     {
         // Chuột phải mở menu. Mobile: Chạm nhẹ (Tap) mở menu.
@@ -93,7 +90,6 @@ public class ItemPrice : MonoBehaviour, IPointerClickHandler
         }
 
         // Thực hiện mua
-        // Quan trọng: Phải Instantiate một bản sao item để đưa vào túi đồ
         GameObject purchasedItem = Instantiate(itemData.gameObject);
 
         if (inventory.AddItem(purchasedItem))
@@ -118,39 +114,6 @@ public class ItemPrice : MonoBehaviour, IPointerClickHandler
         }
     }
 
-    /*
-    public void BuyItem()
-    {
-        Debug.Log("Mua item: " + itemData.itemName + " giá " + itemData.price);
-
-        if (playerHealth == null || inventory == null)
-        {
-            Debug.LogError("Không tìm thấy PlayerMoney hoặc InventoryController!");
-            return;
-        }
-
-        // Kiểm tra đủ tiền
-        if (playerHealth.Gold < itemData.price)
-        {
-            Debug.Log("Không đủ vàng!");
-            return;
-        }
-
-        playerHealth.SpendGold(itemData.price);
-
-
-        // Add vào inventory
-        if (inventory.AddItem(itemData.gameObject))
-        {
-            Debug.Log("Đã mua: " + itemData.itemName);
-            Destroy(gameObject); // Xoá item khỏi shop
-        }
-        else
-        {
-            Debug.Log("Inventory đầy!");
-        }
-    }
-    */
 
     public Item GetItemData()
     {

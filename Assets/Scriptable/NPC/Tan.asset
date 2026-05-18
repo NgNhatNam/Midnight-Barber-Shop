@@ -179,7 +179,7 @@ MonoBehaviour:
       isCompletedLine: 1
       branchChoice: []
   - description: Quest3
-    minLevel: 0
+    minLevel: 10
     requiredSeason: 0
     startHour: 1
     endHour: 0

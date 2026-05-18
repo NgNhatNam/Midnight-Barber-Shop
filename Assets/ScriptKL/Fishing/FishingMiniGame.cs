@@ -65,11 +65,11 @@ public class FishingMiniGame : MonoBehaviour
 
         float price = currentFishData.price;
 
-        // Xác định bậc 
+        
         int tier = Mathf.FloorToInt(price / 100f);
-        tier = Mathf.Clamp(tier, 1, 9); // Giới hạn từ bậc 1 đến bậc 9
+        tier = Mathf.Clamp(tier, 1, 9); 
 
-        // TÍNH ĐỘ DÀI BOBBER THEO TỪNG BẬC
+        // TÍNH ĐỘ DÀI BOBBER 
         float baseHeight = 0f;
         float minHeightInTier = 0f;
         
@@ -87,7 +87,7 @@ public class FishingMiniGame : MonoBehaviour
             default: baseHeight = 60f; minHeightInTier = 50f; break;
         }
 
-        // Tính toán độ giảm trong nội bộ bậc đó
+        // Tính toán độ giảm của vùng câu 
         float tInTier = (price % 100) / 99f;
         float targetHeight = Mathf.Lerp(baseHeight, minHeightInTier, tInTier);
 
@@ -95,7 +95,6 @@ public class FishingMiniGame : MonoBehaviour
         bobberRect.sizeDelta = new Vector2(bobberRect.sizeDelta.x, targetHeight);
 
         // TÍNH TỐC ĐỘ CÁ 
-        // Càng lên bậc cao cá càng nhanh
         fishSpeed = 1.5f + (tier * 0.4f) + (tInTier * 0.2f);
         fishSpeed = Mathf.Clamp(fishSpeed, 1.8f, 6.0f);
 
@@ -103,7 +102,7 @@ public class FishingMiniGame : MonoBehaviour
         tempMinWait = Mathf.Max(0.2f, 1.0f - (tier * 0.1f));
         tempMaxWait = Mathf.Max(0.5f, 2.0f - (tier * 0.15f));
 
-        // Kinh nghiệm và Mana của player sau khi câu cá
+        
         expReward = tier * 15;
         staminaCost = 3 + (tier * 2);
         Debug.Log($"[Tier {tier}] Cá: {currentFishData.itemName} | Giá: {price} | Bobber Height: {targetHeight:F1}");
@@ -154,7 +153,6 @@ public class FishingMiniGame : MonoBehaviour
             fishDestination = Random.Range(0, areaRect.rect.height - fishRect.rect.height);
         }
 
-        // Dùng SmoothDamp hoặc Lerp để di chuyển mượt mà
         fishPosition = Mathf.Lerp(fishPosition, fishDestination, Time.deltaTime * fishSpeed);
         fishRect.anchoredPosition = new Vector2(0, fishPosition);
     }

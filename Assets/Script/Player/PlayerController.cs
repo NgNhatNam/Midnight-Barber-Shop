@@ -47,10 +47,8 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
-        // 1. Xử lý tấn công
         HandleAttack();
 
-        // 2. NHẬN DIỆN THIẾT BỊ ĐỂ QUYẾT ĐỊNH CHẠY/ĐI BỘ
         CheckMovementState();
     }
 
@@ -99,10 +97,8 @@ public class PlayerController : MonoBehaviour
             return;
         }
 
-        // Tốc độ dựa trên trạng thái đã nhận diện ở Update
         float currentSpeed = isRunning ? runSpeed : walkSpeed;
 
-        // DI CHUYỂN (Sử dụng MovePosition để tránh lỗi va chạm khựng)
         Vector2 movement = moveInput.normalized * currentSpeed * Time.fixedDeltaTime;
         rb2D.MovePosition(rb2D.position + movement);
 
@@ -118,49 +114,7 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    /*
-    void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.L) && !isHit && playerCombats.enabled == true 
-            || Input.GetKeyDown(KeyCode.Mouse1) && !isHit && playerCombats.enabled == true)
-        {
-            playerCombats?.Shoot(spriteRenderer.flipX); // Gọi qua combat
-        }
-  
 
-        if (Keyboard.current.leftShiftKey.wasPressedThisFrame)
-        {
-            isRunningPressed = true;
-        } 
-        if (Keyboard.current.leftShiftKey.wasReleasedThisFrame)
-        {
-            isRunningPressed = false;
-        }
-
-    }
-
-    private void FixedUpdate()
-    {
-
-        if (isHit || (playerCombats != null && playerCombats.IsAttacking))
-        {
-            rb2D.linearVelocity = Vector2.zero;
-            return;
-        }
-
-        float currentSpeed = isRunningPressed ? runSpeed : walkSpeed;
-        rb2D.linearVelocity = moveInput * currentSpeed;
-        if (moveInput != Vector2.zero)
-        {
-            ChangeAnimationState(isRunningPressed ? PLAYER_RUN : PLAYER_WALK);
-        }
-        else
-        {
-            ChangeAnimationState(PLAYER_IDLE);
-        }
-    }
-
-    */
     public void Flip()
     {
 
@@ -201,7 +155,6 @@ public class PlayerController : MonoBehaviour
         isHit = false;
     }
 
-  
     public void PlayAttackAnimation()
     {
         ChangeAnimationState(PLAYER_ATTACK);
@@ -215,38 +168,4 @@ public class PlayerController : MonoBehaviour
     }
 
 }
-    /*
-    public void Shoot()
-    {
-        GameObject bullet = bulletPool.GetObject();
-        bullet.transform.position = firePoint.position;
-
-        Rigidbody2D rb = bullet.GetComponent<Rigidbody2D>();
-        rb.linearVelocity = (spriteRenderer.flipX ? Vector2.right : Vector2.left) * bulletSpeed;
-        // Bỏ qua va chạm giữa đạn và trigger map
-        Collider2D bulletCol = bullet.GetComponent<Collider2D>();
-        if (bulletCol != null)
-        {
-            var mapTriggers = FindObjectsByType<MapTransation>(FindObjectsSortMode.None);
-            foreach (var trigger in mapTriggers)
-            {
-                var mapCollider = trigger.GetComponent<Collider2D>();
-                if (mapCollider != null)
-                {
-                    Physics2D.IgnoreCollision(bulletCol, mapCollider);
-                }
-            }
-        }
-
-        // Có thể phát animation tấn công
-        ChangeAnimationState(PLAYER_ATTACK);
-        StartCoroutine(AttackCooldown());
-    }
-
-    private IEnumerator AttackCooldown()
-    {
-        isAttacking = true;
-        yield return new WaitForSeconds(attackDelay);
-        isAttacking = false;
-    }
-*/
+    

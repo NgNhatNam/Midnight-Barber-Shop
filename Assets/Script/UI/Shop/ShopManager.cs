@@ -10,7 +10,6 @@ public class ShopManager : MonoBehaviour, IInteractable
     public string shopID;
     [SerializeField] private string shopDisplayName;
     [SerializeField] private Sprite shopIcon;
-    //[SerializeField] private ItemType typeToSell;
     [SerializeField] private List<ItemType> typesToSell = new List<ItemType>();
 
     [Header("Visuals")]

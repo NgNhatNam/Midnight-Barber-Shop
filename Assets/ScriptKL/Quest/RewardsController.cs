@@ -52,30 +52,6 @@ public class RewardsController : MonoBehaviour
         }
     }
 
-    /*
-    public void GiveQuestReward(Quest quest)
-    {
-        if (quest == null || quest.questRewards == null) return;
-        Health playerHealth = FindAnyObjectByType<Health>();
-
-        foreach (var reward in quest.questRewards)
-        {
-            switch (reward.type) 
-            { 
-                case RewardType.Item:
-                    //GiveItemReward
-                    GiveItemReward(reward.rewardID, reward.amount);
-                    break;
-                case RewardType.Gold:
-                    break;
-                case RewardType.Experience:
-                    break;
-                case RewardType.Custom:
-                    //GiveItemReward
-                    break;
-            }
-        }
-    }*/
  
     public void GiveItemReward(int itemID, int amount)
     {

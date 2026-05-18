@@ -40,10 +40,9 @@ public class QuestUI : MonoBehaviour
             TMP_Text questNameText = entry.transform.Find("QuestName")?.GetComponent<TMP_Text>();
             Transform objectiveList = entry.transform.Find("ObjectiveList");
 
-            // Kiểm tra xem đã kéo đúng tên trong Prefab chưa
+            
             if (questNameText != null)
             {
-                // Nên dùng questName (biến bạn đặt trong class Quest) thay vì .name (tên file SO)
                 questNameText.text = questProgress.quest.questName;
             }
             else
@@ -70,31 +69,5 @@ public class QuestUI : MonoBehaviour
             }
         }
     }
-    /*
-    public void UpdateQuestUI()
-    {
-        //Destroy existing quest entries
-        foreach (Transform child in questListContent)
-        {
-            Destroy(child.gameObject);
-        }
-        
-        //Build quest entries
-        foreach(var quest in QuestController.Instance.activateQuests)
-        {
-            GameObject entry = Instantiate(questEntryPrefab, questListContent);
-            TMP_Text questNameText = entry.transform.Find("QuestName").GetComponent<TMP_Text>();
-            Transform objectiveList = entry.transform.Find("ObjectiveList");
-
-            questNameText.text = quest.quest.name;
-
-            foreach(var objective in quest.objectives)
-            {
-                GameObject objTextGO = Instantiate(objectiveTextPrefab, objectiveList);
-                TMP_Text objText = objTextGO.GetComponent<TMP_Text>();
-                objText.text = $"{objective.description} ({objective.currentAmount}/{objective.requiredAmount})";
-            }
-        }
-    }
-    */
+    
 }

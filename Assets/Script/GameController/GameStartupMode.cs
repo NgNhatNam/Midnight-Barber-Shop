@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 
 public class GameStartupMode : MonoBehaviour
 {
@@ -7,7 +7,7 @@ public class GameStartupMode : MonoBehaviour
 
     void Awake()
     {
-        string mode = PlayerPrefs.GetString("GameMode", "New");
+        string mode = PlayerPrefs.GetString("GameMode", "None");
 
         if (mode == "New")
         {
@@ -22,5 +22,16 @@ public class GameStartupMode : MonoBehaviour
 
         // Xóa tránh chạy lại sau Reload scene
         PlayerPrefs.DeleteKey("GameMode");
+
+        // Force black screen during transition
+        if (mode != "None")
+        {
+            // Find ScreenFader explicitly in case it hasn't Awoken yet
+            ScreenFader fader = FindAnyObjectByType<ScreenFader>();
+            if (fader != null)
+            {
+                fader.SetAlpha(1f);
+            }
+        }
     }
 }

@@ -155,7 +155,7 @@ public class Health : MonoBehaviour
         {
             currentLevel++;
             currentEXP -= expToNextLevel;
-            expToNextLevel = Mathf.RoundToInt(expToNextLevel * 1.3f); // Tăng độ khó
+            expToNextLevel = Mathf.RoundToInt(expToNextLevel * 1.3f); 
         }
     }
 

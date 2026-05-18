@@ -163,7 +163,6 @@ public class Animal : MonoBehaviour, IInteractable
             attempts++;
 
             // Nếu thử quá 10 lần không tìm được điểm trong vùng, thì lấy đại một điểm ngẫu nhiên TRONG bounds
-            // chứ không lấy ngay Center
             if (attempts > 10 && moveArea != null)
             {
                 return new Vector2(

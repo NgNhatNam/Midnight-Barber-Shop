@@ -28,7 +28,7 @@ public class InteractionDetector : MonoBehaviour
         interactableInRange.Interact();        
     }
     
-    private void OnTriggerStay2D(Collider2D collision) // Enter thành stay 
+    private void OnTriggerStay2D(Collider2D collision) 
     {
         if (collision.TryGetComponent(out IInteractable interactable) && interactable.CanInteract())
         {

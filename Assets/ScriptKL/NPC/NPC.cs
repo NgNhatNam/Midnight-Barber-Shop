@@ -23,7 +23,7 @@ public class NPC : MonoBehaviour, IInteractable
     private Health playerHealth;
 
     [Header("Movement Speeds")]
-    private bool isExitDelay = false; // Trạng thái chờ 1s sau khi hội thoại
+    private bool isExitDelay = false; // Trạng thái chờ sau khi hội thoại
     public float moveSpeed = 2f;
 
     // Animation
@@ -45,15 +45,18 @@ public class NPC : MonoBehaviour, IInteractable
     public Image portraitImage;
     public Transform choiceContainer;
     public GameObject choiceButtonPrefab;
-    private Quest activeQuestInConversation; // Biến tạm để lưu quest của cuộc đối thoại này
+    private Quest activeQuestInConversation; // Biến tạm để lưu quest của cuộc đối thoại 
 
     // Bug ==========================================
+
     private float lastDialogueEndTime = -999f;
     public float interactionCooldown = 1.5f;
-    // Biến static giúp tất cả NPC biết được có ai đó đang nói chuyện không
-    private static bool IsAnyNPCSpeaking = false;
-    private bool isThisNPCSpeaking = false; // Trạng thái riêng của NPC này
+
+   
+    private static bool IsAnyNPCSpeaking = false; // Biến static giúp tất cả NPC biết được có ai đó đang nói chuyện không
+    private bool isThisNPCSpeaking = false; // Trạng thái riêng của NPC đang nói
     private Coroutine typingCoroutine;
+
     //=============================================
 
     private List<DialogueLine> activeLines;
@@ -79,7 +82,6 @@ public class NPC : MonoBehaviour, IInteractable
 
     void Update()
     {
-        // Thêm isExitDelay vào điều kiện dừng
         if (isThisNPCSpeaking || isWaiting || isExitDelay)
         {
             if (agent.isActiveAndEnabled)
@@ -141,7 +143,7 @@ public class NPC : MonoBehaviour, IInteractable
     {
         if (currentSchedule == null || currentSchedule.waypoints == null || currentSchedule.waypoints.Count == 0) return;
 
-        // 1. Kiểm tra va chạm biên (Giữ nguyên để Teleport)
+        // Kiểm tra va chạm biên
         Collider2D hit = Physics2D.OverlapPoint(transform.position, mapBoundLayer);
         if (hit == null)
         {
@@ -149,7 +151,7 @@ public class NPC : MonoBehaviour, IInteractable
             return;
         }
 
-        // 2. Lấy vị trí đích hiện tại
+        // Lấy vị trí đích hiện tại
         Vector3 targetPos = currentSchedule.waypoints[currentWaypointIndex].position;
         float distanceToDestination = Vector2.Distance(transform.position, targetPos);
 
@@ -161,7 +163,6 @@ public class NPC : MonoBehaviour, IInteractable
         }
         else
         {
-            // --- LOGIC SỬA TẠI ĐÂY ---
             // Kiểm tra xem đã đến Element cuối cùng của danh sách chưa
             if (currentWaypointIndex < currentSchedule.waypoints.Count - 1)
             {
@@ -170,11 +171,10 @@ public class NPC : MonoBehaviour, IInteractable
             }
             else
             {
-                // ĐÃ ĐẾN ĐÍCH (Element cuối cùng): Dừng Agent hoàn toàn
+                // Element cuối cùng, Dừng Agent
                 agent.isStopped = true;
                 agent.velocity = Vector2.zero;
 
-                // Chuyển sang Action Animation (ngồi, đứng chơi...) nếu có, không thì Idle
                 string actionAnim = string.IsNullOrEmpty(currentSchedule.actionAnim) ? NPC_IDLE : currentSchedule.actionAnim;
                 ChangeAnimationState(actionAnim);
             }
@@ -329,7 +329,7 @@ public class NPC : MonoBehaviour, IInteractable
 
         string qID = activeQuestInConversation.questID;
 
-        // Đã hoàn thành (đủ điều kiện) nhưng chưa trả hoặc đã trả rồi
+        // Đã hoàn thành, nhưng chưa trả hoặc đã trả rồi
         if (QuestController.Instance.IsQuestCompleted(qID) || QuestController.Instance.IsQuestHandedIn(qID))
         {
             questState = QuestState.Completed;
@@ -355,9 +355,7 @@ public class NPC : MonoBehaviour, IInteractable
 
         activeQuestInConversation = null;
 
-        // --- BƯỚC 1: ƯU TIÊN QUEST ĐANG LÀM (IN PROGRESS) ---
-        // Duyệt danh sách để xem Player có đang giữ Quest nào của NPC này không.
-        // Nếu có, tập trung vào Quest đó, không quan tâm các Quest mới khác.
+        // Duyệt danh sách để xem Player có đang giữ Quest nào của NPC này không. Nếu có, tập trung vào Quest đó, không quan tâm các Quest mới khác
         foreach (var group in dialogueData.conditionalGroups)
         {
             if (group.quest != null && group.IsValid(now, currentLevel))
@@ -365,30 +363,26 @@ public class NPC : MonoBehaviour, IInteractable
                 if (QuestController.Instance.IsQuestActive(group.quest.questID))
                 {
                     activeQuestInConversation = group.quest;
-                    return group.dialogueLines; // Trả về ngay lập tức
+                    return group.dialogueLines; 
                 }
             }
         }
 
-        // --- BƯỚC 2: TÌM QUEST MỚI (CHỈ CHẠY KHI KHÔNG CÓ QUEST ĐANG LÀM) ---
-        // Vòng lặp foreach sẽ tự động chạy từ trên xuống dưới (từ Element 0).
-        // Quest nào thỏa mãn IsValid đầu tiên sẽ được chọn -> Đúng ý đồ ưu tiên Element trước.
+        // --- TÌM QUEST MỚI, CHỈ CHẠY KHI KHÔNG CÓ QUEST ĐANG LÀM ---
+        // Vòng lặp foreach sẽ tự động chạy từ trên xuống dưới. Quest nào thỏa mãn IsValid đầu tiên sẽ được chọn
         foreach (var group in dialogueData.conditionalGroups)
         {
             if (group.quest != null && group.IsValid(now, currentLevel))
             {
                 string qID = group.quest.questID;
-                // Điều kiện: Chưa nhận (Active) và chưa hoàn thành trả thưởng xong (HandedIn)
                 if (!QuestController.Instance.IsQuestActive(qID) && !QuestController.Instance.IsQuestHandedIn(qID))
                 {
                     activeQuestInConversation = group.quest;
-                    return group.dialogueLines; // Lấy Quest đầu tiên tìm thấy và thoát hàm
+                    return group.dialogueLines; 
                 }
             }
         }
 
-        // --- BƯỚC 3: HỘI THOẠI THÔNG THƯỜNG ---
-        // Nếu không có Quest nào (cũ hay mới), NPC mới nói chuyện phiếm theo điều kiện.
         foreach (var group in dialogueData.conditionalGroups)
         {
             if (group.quest == null && group.IsValid(now, currentLevel))
@@ -397,8 +391,7 @@ public class NPC : MonoBehaviour, IInteractable
             }
         }
 
-        // --- BƯỚC 4: DỰ PHÒNG (FALLBACK) ---
-        // Nếu tất cả các điều kiện trên đều không khớp, lấy Element đầu tiên làm mặc định.
+        // Nếu tất cả các điều kiện trên đều không khớp, lấy Element đầu tiên làm mặc định
         if (dialogueData.conditionalGroups.Count > 0)
         {
             return dialogueData.conditionalGroups[0].dialogueLines;
@@ -431,7 +424,7 @@ public class NPC : MonoBehaviour, IInteractable
         // Sau khi chạy chữ xong, kiểm tra xem câu này có Choice không
         CheckAndDisplayChoices();
 
-        // Nếu KHÔNG có Choice và có AutoProgress thì mới tự qua câu
+        // Nếu không có Choice và có AutoProgress thì mới tự qua câu
         if (choiceContainer.childCount == 0 && activeLines[dialogueIndex].autoProgress)
         {
             yield return new WaitForSecondsRealtime(dialogueData.autoPorgressDelay);
@@ -480,13 +473,12 @@ public class NPC : MonoBehaviour, IInteractable
     // Choice 
     private void CheckAndDisplayChoices()
     {
-        // 1. Dọn dẹp các nút cũ
         ClearChoices();
 
-        // 2. Lấy dữ liệu câu thoại hiện tại
+        // Lấy dữ liệu câu thoại hiện tại
         DialogueLine currentLine = activeLines[dialogueIndex];
 
-        // 3. Nếu câu thoại này có chứa danh sách các lựa chọn
+        // Nếu câu thoại này có chứa danh sách các lựa chọn
         if (currentLine.branchChoice != null && currentLine.branchChoice.Count > 0)
         {
             foreach (DialogueChoice choice in currentLine.branchChoice)
@@ -560,7 +552,7 @@ public class NPC : MonoBehaviour, IInteractable
         if (agent != null && agent.isActiveAndEnabled)
         {
             agent.isStopped = false;
-            // Ép NPC quay lại hành trình cũ ngay lập tức
+            // NPC quay lại lịch trình cũ 
             if (currentSchedule != null && currentSchedule.waypoints.Count > 0)
             {
                 Vector3 targetPos = currentSchedule.waypoints[currentWaypointIndex].position;
@@ -569,7 +561,6 @@ public class NPC : MonoBehaviour, IInteractable
         }
 
         
-        // Bắt đầu quá trình chờ 1 giây trước khi cho phép di chuyển lại
         StartCoroutine(ReactivateMovementAfterDelay(1f));
     }
 
@@ -583,7 +574,6 @@ public class NPC : MonoBehaviour, IInteractable
 
     #region UI Helpers
 
-    
     public void ClearChoices()
     {
         foreach (Transform child in choiceContainer) Destroy(child.gameObject);
@@ -616,9 +606,8 @@ public class NPC : MonoBehaviour, IInteractable
     {
         isWaiting = true;
         agent.isStopped = true;
-        agent.velocity = Vector2.zero; // Triệt tiêu lực quán tính ngay lập tức
+        agent.velocity = Vector2.zero; 
 
-        // Chờ 1 đoạn thời gian
         yield return new WaitForSeconds(waitTime);
 
         isWaiting = false;
@@ -679,8 +668,6 @@ public class NPC : MonoBehaviour, IInteractable
     #region reset if UI Dialogue NPC disable
     void OnEnable()
     {
-        // Đăng ký: Khi có ai đó báo hiệu UI tắt, tôi sẽ chạy hàm EndDialogue
-        // Bạn có thể tạo một static event ở một script UI Manager nào đó
         DialogueEvents.OnDialogueUIClosed += ForceResetNPC;
     }
 

@@ -109,6 +109,8 @@ public class AudioController : MonoBehaviour
 
     public void PlaySFX(AudioClip clip, bool loop = true)
     {
+        if (SaveController.IsLoadingGame) return;
+        
         SFXSource.clip = clip;
         SFXSource.loop = loop;
         SFXSource.Play();

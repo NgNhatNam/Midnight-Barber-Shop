@@ -24,64 +24,15 @@ public class ItemDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, I
         //itemData = GetComponent<Item>();
     }
 
-    /*
-    public void OnPointerClick(PointerEventData eventData)
-    {
-        if (eventData.button == PointerEventData.InputButton.Right)
-        {
-            ItemUI.Instance.Show(this, eventData.position);
-        }
-    }
-
-    public void UseItem()
-    {
-        Debug.Log("Dùng item: " + itemData.ID);
-
-        playerHealth.Heal(itemData.amountHP);
-        playerHealth.HealMN(itemData.amountMN);
-        playerHealth.IncreaseStress(itemData.amountST);
-
-        Debug.Log("Máu: " + playerHealth.HP + "Mana: " + playerHealth.MN + "Stress: " + playerHealth.Stress );
-        RemoveFromInventory();
-    }
-
-    public void SellItem()
-    {
-        Debug.Log("Bán item: " + itemData.ID + " giá " + itemData.price);
-
-        playerHealth.AddGold(itemData.price);
-
-        RemoveFromInventory();
-    }
     
-
     public void OnBeginDrag(PointerEventData eventData)
     {
-        ItemUI.Instance.Hide();
-        if (eventData.button != PointerEventData.InputButton.Left)
-            return;
-        Debug.Log("Begin Drag");
-
-        originalParent = transform.parent; //Save OG parent
-
-        transform.SetParent(transform.root); // Above other canvas
-
-        canvasGroup.blocksRaycasts = false;
-        canvasGroup.alpha = 0.6f; // Semi-transparent during drag
-
-    }*/
-
-    public void OnBeginDrag(PointerEventData eventData)
-    {
-        // CỰC KỲ QUAN TRỌNG CHO MOBILE:
-        // Nếu người chơi bắt đầu kéo, phải ẩn ngay cái bảng menu Use/Sell đi
         if (ItemUI.Instance != null)
         {
             ItemUI.Instance.Hide();
         }
 
 
-        // Logic cũ của bạn
         if (eventData.button != PointerEventData.InputButton.Left) return;
 
 
@@ -112,17 +63,16 @@ public class ItemDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, I
 
     public void OnEndDrag(PointerEventData eventData)
     {
-        // 1. Reset trạng thái UI ngay lập tức
         canvasGroup.blocksRaycasts = true;
         canvasGroup.alpha = 1f;
 
         if (eventData.button != PointerEventData.InputButton.Left) return;
 
-        // 2. Tìm Slot bằng RaycastAll (Xuyên qua các lớp UI con)
+        // Tìm Slot bằng RaycastAll (Xuyên qua các lớp UI con)
         Slot dropSlot = FindSlotUnderPointer(eventData);
         Slot originalSlot = originalParent.GetComponent<Slot>();
 
-        // 3. Xử lý các kịch bản Drop
+        // Xử lý các kịch bản Drop
         if (dropSlot != null)
         {
             if (dropSlot == originalSlot)
@@ -132,7 +82,7 @@ public class ItemDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, I
             }
             else if (dropSlot.currentItem != null)
             {
-                // Ô có vật phẩm: Kiểm tra xem có cộng dồn (Stack) được không
+                // Ô có vật phẩm: Kiểm tra xem có Stack được không
                 Item draggedItem = GetComponent<Item>();
                 Item targetItem = dropSlot.currentItem.GetComponent<Item>();
 
@@ -145,7 +95,7 @@ public class ItemDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, I
                 }
                 else
                 {
-                    // Không cùng ID: Đổi chỗ (Swap)
+                    // Không cùng ID: Đổi chỗ Swap
                     SwapItems(originalSlot, dropSlot);
                 }
             }
@@ -174,7 +124,6 @@ public class ItemDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, I
         }
     }
 
-    // --- CÁC HÀM HỖ TRỢ TỐI ƯU ---
 
     private Slot FindSlotUnderPointer(PointerEventData eventData)
     {
@@ -217,8 +166,7 @@ public class ItemDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, I
 
     bool IsWithInInvetory(Vector2 mousePosition)
     {
-        // 1. Xác định xem Item này vốn dĩ xuất phát từ đâu
-        // Chúng ta kiểm tra xem originalParent (ô Slot cũ) nằm trong Inventory hay Toolbar
+        // Xác định xem Item này vốn dĩ xuất phát từ đâu
 
         ToolbarController toolbar = ToolbarController.Instance;
         if (toolbar == null) toolbar = FindAnyObjectByType<ToolbarController>();
@@ -234,7 +182,6 @@ public class ItemDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, I
             isFromToolbar = originalParent.IsChildOf(toolbar.transform);
         }
 
-        // 2. Định nghĩa "Vùng An Toàn" dựa trên xuất xứ của Item
         if (isFromToolbar)
         {
             // Nếu kéo từ Toolbar, vùng an toàn là Toolbar Rect
@@ -293,21 +240,21 @@ public class ItemDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, I
 
         Item item = GetComponent<Item>();
 
-        // 1. CHUỘT PHẢI: Tách Stack
+        // CHUỘT PHẢI: Tách Stack
         if (eventData.button == PointerEventData.InputButton.Right)
         {
-            // Nếu chỉ có 1 cái thì không tách, mà hiện Menu luôn (hoặc không làm gì)
+            // Nếu chỉ có 1 cái thì không tách, mà hiện Menu luôn hoặc không làm gì
             if (item != null && item.quantity > 1)
             {
                 SplitStack();
             }
             else
             {
-                // Nếu chỉ có 1 cái, chuột phải cũng hiện Menu cho tiện
+                // Nếu chỉ có 1 cái, chuột phải cũng hiện Menu 
                 ItemUI.Instance.Show(item, eventData.position);
             }
         }
-        // 2. CHUỘT TRÁI (Hoặc Tap trên Mobile): Hiện Menu Use/Sell và Highlight Slot
+        // CHUỘT TRÁI (Hoặc Tap trên Mobile): Hiện Menu Use/Sell và Highlight Slot
         else if (eventData.button == PointerEventData.InputButton.Left)
         {
             // Highlight Slot
@@ -352,19 +299,7 @@ public class ItemDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, I
                 return;
             }
         }
-        /*
-        foreach(Transform slotTransform in inventoryController.inventoryPanel.transform)
-        {
-            Slot slot = slotTransform.GetComponent<Slot>();
-            if(slot != null && slot.currentItem == null) 
-            {
-                slot.currentItem = newItem;
-                newItem.transform.SetParent(slot.transform);
-                newItem.GetComponent<RectTransform>().anchoredPosition = Vector2.zero;
-                return;
-            }
-        }
-        */
+        
         // No Empty slot - return to stack
         item.AddToStack(splitAmount);
         Destroy(newItem);
@@ -373,258 +308,9 @@ public class ItemDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, I
 
     void RemoveFromInventory()
     {
-        /*
-        Slot slot = transform.parent.GetComponent<Slot>();
-        if (slot != null)
-            slot.currentItem = null;
-        */
+       
         Destroy(gameObject); // xoá UI item
     }
 }
 
-
-
-/*
-bool IsWithInInvetory(Vector2 mousePosition)
-{
-    GameObject invPanel = InventoryController.Instance.inventoryPanel;
-    RectTransform invetoryRect = invPanel.GetComponent<RectTransform>();
-    return RectTransformUtility.RectangleContainsScreenPoint(invetoryRect, mousePosition);
-}
- public void OnEndDrag(PointerEventData eventData)
-{
-    canvasGroup.blocksRaycasts = true;
-    canvasGroup.alpha = 1f;
-
-    if (eventData.button != PointerEventData.InputButton.Left) return;
-
-    Slot dropSlot = null;
-    var results = new System.Collections.Generic.List<RaycastResult>();
-    EventSystem.current.RaycastAll(eventData, results);
-
-    foreach (var result in results)
-    {
-        // Quét xem dưới chuột có cái Slot nào không
-        dropSlot = result.gameObject.GetComponent<Slot>();
-        if (dropSlot == null) dropSlot = result.gameObject.GetComponentInParent<Slot>();
-
-        if (dropSlot != null) break; 
-    }
-
-    Slot originalSlot = originalParent.GetComponent<Slot>();
-
-    // Thả vào chính ô cũ (Tránh lỗi biến mất item)
-    if (dropSlot == originalSlot)
-    {
-        transform.SetParent(originalParent);
-        transform.localScale = Vector3.one; 
-        GetComponent<RectTransform>().anchoredPosition = Vector2.zero;
-        return;
-    }
-
-    if (dropSlot != null)
-    {
-        if (dropSlot.currentItem != null)
-        {
-            Item draggedItem = GetComponent<Item>();
-            Item targetItem = dropSlot.currentItem.GetComponent<Item>();
-
-            if (draggedItem.ID == targetItem.ID)
-            {
-                targetItem.AddToStack(draggedItem.quantity);
-                originalSlot.currentItem = null;
-                Destroy(gameObject);
-                return;
-            }
-            else
-            {
-                // SWAP ITEM
-                dropSlot.currentItem.transform.SetParent(originalSlot.transform);
-                dropSlot.currentItem.transform.localScale = Vector3.one;
-
-                originalSlot.currentItem = dropSlot.currentItem;
-                originalSlot.currentItem.GetComponent<RectTransform>().anchoredPosition = Vector2.zero;
-
-                transform.SetParent(dropSlot.transform);
-                transform.localScale = Vector3.one; 
-                dropSlot.currentItem = gameObject;
-                GetComponent<RectTransform>().anchoredPosition = Vector2.zero;
-            }
-        }
-        else
-        {
-            // THẢ VÀO Ô TRỐNG
-            originalSlot.currentItem = null;
-            transform.SetParent(dropSlot.transform);
-            transform.localScale = Vector3.one; 
-            dropSlot.currentItem = gameObject;
-            GetComponent<RectTransform>().anchoredPosition = Vector2.zero;
-        }
-
-        // Toolbar Select
-        ToolbarController toolbar = FindAnyObjectByType<ToolbarController>();
-        if (toolbar != null) toolbar.SelectSlot(dropSlot);
-    }
-    else
-    {
-        if (!IsWithInInvetory(eventData.position))
-        {
-            DropItem(originalSlot);
-        }
-        else
-        {
-            // SNAP BACK
-            transform.SetParent(originalParent);
-            transform.localScale = Vector3.one; 
-            GetComponent<RectTransform>().anchoredPosition = Vector2.zero;
-        }
-    }
-}
-
-    public void OnEndDrag(PointerEventData eventData)
-{
-    canvasGroup.blocksRaycasts = true; // Enables raycasts
-    canvasGroup.alpha = 1f; //No longer transparent
-
-    if (eventData.button != PointerEventData.InputButton.Left)
-        return;
-
-    Debug.Log("End Drag");
-    Slot dropSlot = eventData.pointerEnter?.GetComponent<Slot>(); //Slot where item dropped
-
-
-    if (dropSlot == null)
-    {
-        GameObject dropItem = eventData.pointerEnter;
-        if (dropItem != null)
-        {
-            dropSlot = dropItem.GetComponentInParent<Slot>();
-        }
-    }
-
-    Slot originalSlot = originalParent.GetComponent<Slot>();
-
-    if (dropSlot != null)
-    {
-
-        // Is a slot under drop point
-        if (dropSlot.currentItem != null)
-        {
-
-            Item draggedItem = GetComponent<Item>();
-            Item targetItem = dropSlot.currentItem.GetComponent<Item>();
-
-            if (draggedItem.ID == targetItem.ID)
-            {
-                targetItem.AddToStack(draggedItem.quantity);
-                originalSlot.currentItem = null;
-                Destroy(gameObject);
-                return;
-            }
-            else
-            {
-                //Slot has an item - swap item
-                dropSlot.currentItem.transform.SetParent(originalSlot.transform);
-                originalSlot.currentItem = dropSlot.currentItem;
-                dropSlot.currentItem.GetComponent<RectTransform>().anchoredPosition = Vector2.zero;
-
-
-                // Move item into drop slot
-                transform.SetParent(dropSlot.transform);
-                dropSlot.currentItem = gameObject;
-                GetComponent<RectTransform>().anchoredPosition = Vector2.zero; // Zero
-
-            }
-        }
-        else
-        {
-            originalSlot.currentItem = null;
-            // Move item into drop slot
-            transform.SetParent(dropSlot.transform);
-            dropSlot.currentItem = gameObject;
-            GetComponent<RectTransform>().anchoredPosition = Vector2.zero; // Zero
-        }
-
-        // THêm
-
-        if (dropSlot != null)
-        {
-            ToolbarController toolbar = FindAnyObjectByType<ToolbarController>();
-            if (toolbar != null)
-            {
-                toolbar.SelectSlot(dropSlot);
-            }
-        }
-        //GetComponent<RectTransform>().anchoredPosition = Vector2.zero;
-
-        //================================================================
-
-    }
-    else
-    {
-        // Nếu như drop ngoài inventory
-        if (!IsWithInInvetory(eventData.position))
-        {
-            // drop item 
-            DropItem(originalSlot);
-        }
-        else
-        {
-            //Snap back to og slot
-            transform.SetParent(originalParent);
-            GetComponent<RectTransform>().anchoredPosition = Vector2.zero; // Zero
-        }
-    }
-}
-
-bool IsWithInInvetory(Vector2 mousePosition)
-{
-    RectTransform invetoryRect = originalParent.parent.GetComponent<RectTransform>();
-    return RectTransformUtility.RectangleContainsScreenPoint(invetoryRect, mousePosition);
-}
-
-void DropItem(Slot originalSlot)
-{
-
-    Item item = GetComponent<Item>();
-    int quantity = item.quantity;
-    if (quantity > 0)
-    {
-        item.RemoveFromStack();
-
-        transform.SetParent(originalParent);
-        GetComponent<RectTransform>().anchoredPosition = Vector2.zero;
-
-        quantity = 1;
-    }
-    else
-    {
-        originalSlot.currentItem = null;
-    }
-
-    //Find player
-    Transform playerTransform = GameObject.FindGameObjectWithTag("Player")?.transform;
-    if (playerTransform == null) {
-        Debug.LogError("Missing 'Player' tag");
-        return;
-    }
-
-    //Random Drop position
-    Vector2 dropOffset = Random.insideUnitCircle.normalized * Random.Range(minDropDistance, maxDropDistance);
-    Vector2 dropPosition = (Vector2)playerTransform.position + dropOffset;
-
-    //Instantiate drop item
-    GameObject dropItem = Instantiate(gameObject, dropPosition, Quaternion.identity);
-
-    Item droppedItem = dropItem.GetComponent<Item>();
-    droppedItem.quantity = 1;
-
-
-    //Destroy the UI one
-    if (quantity <= 1 && originalSlot.currentItem == null)
-    {
-        Destroy(gameObject);
-    }
-}
-*/
 

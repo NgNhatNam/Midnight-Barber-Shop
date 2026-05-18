@@ -2,14 +2,14 @@
 
 public class ToolbarController : MonoBehaviour
 {
-    public static ToolbarController Instance; // Thêm dòng này
+    public static ToolbarController Instance; 
 
     public Slot[] slots;
     private int selectedIndex = 0;
 
     private void Awake()
     {
-        Instance = this; // Gán Instance khi game bắt đầu
+        Instance = this; 
     }
 
     void Start()
@@ -31,7 +31,6 @@ public class ToolbarController : MonoBehaviour
         }
     }
 
-    // Hàm này để các Slot/Item gọi khi được chạm vào
     public void SelectSlot(Slot targetSlot)
     {
         for (int i = 0; i < slots.Length; i++)
@@ -45,19 +44,18 @@ public class ToolbarController : MonoBehaviour
         }
     }
 
-    // HÀM MỚI: Dành cho Mobile/Click chọn ô
     public void SelectSlotByPointer(Slot clickedSlot)
     {
         for (int i = 0; i < slots.Length; i++)
         {
             if (slots[i] == clickedSlot)
             {
-                // Nếu bấm vào ô đã được chọn rồi -> Thực hiện hành động (Dùng Item)
+                
                 if (selectedIndex == i)
                 {
                     ExecuteItemAction();
                 }
-                else // Nếu bấm vào ô khác -> Chỉ chuyển Highlight qua đó
+                else 
                 {
                     selectedIndex = i;
                     UpdateSelection();
@@ -67,7 +65,6 @@ public class ToolbarController : MonoBehaviour
         }
     }
 
-    // Hàm lấy Item đang được chọn trên Toolbar
     public Item GetSelectedItem()
     {
         Slot currentSlot = slots[selectedIndex];

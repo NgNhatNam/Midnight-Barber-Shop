@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -7,9 +7,9 @@ public class SleepUI : MonoBehaviour, IInteractable
     public static SleepUI Instance { get; private set; }
 
     [Header("UI Windows")]
-    public GameObject TabUi;           // Túi đồ (để kiểm tra tránh chồng lấp UI)
-    public GameObject InteractPrompt;   // Cái chữ "Bấm E để ngủ" hiện ở giường
-    public GameObject SleepWindow;     // Cái Panel to chứa ScrollView
+    public GameObject TabUi;           
+    public GameObject InteractPrompt;   
+    public GameObject SleepWindow;     
 
     [Header("Scroll Config")]
     [SerializeField] private Transform scrollContent;
@@ -21,7 +21,6 @@ public class SleepUI : MonoBehaviour, IInteractable
     private void Awake()
     {
         if (Instance == null) Instance = this;
-        //else Destroy(gameObject);
 
         timeChanger = FindFirstObjectByType<TimeChanger>();
         saveController = FindFirstObjectByType<SaveController>();
@@ -46,7 +45,7 @@ public class SleepUI : MonoBehaviour, IInteractable
     {
         SleepWindow.SetActive(true);
         InteractPrompt.SetActive(false);
-        Time.timeScale = 0f; // Dừng game để chọn giờ
+        Time.timeScale = 0f; 
 
         // Làm mới danh sách trong ScrollView
         foreach (Transform child in scrollContent) Destroy(child.gameObject);
@@ -85,6 +84,7 @@ public class SleepUI : MonoBehaviour, IInteractable
 
     private void Update()
     {
+        if (TabUi == null || SleepWindow == null) return;
 
         if (TabUi.activeSelf && SleepWindow.activeSelf)
         {
@@ -96,21 +96,5 @@ public class SleepUI : MonoBehaviour, IInteractable
             CloseSleepUI();
         }
     }
-
-    /*
-    private void OnTriggerEnter2D(Collider2D collision)
-    {
-        if (collision.CompareTag("Player")) InteractPrompt.SetActive(true);
-    }
-
-    private void OnTriggerExit2D(Collider2D collision)
-    {
-        if (collision.CompareTag("Player"))
-        {
-            InteractPrompt.SetActive(false);
-            if (SleepWindow.activeSelf) CloseSleepUI();
-        }
-    }
-    */
     
 }

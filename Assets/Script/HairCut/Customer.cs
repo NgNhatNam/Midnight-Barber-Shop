@@ -138,7 +138,7 @@ public class Customer : MonoBehaviour, IInteractable
             }
         }
 
-        // Chuyển về Idle một nhịp trước khi biến mất (tùy chọn)
+        // Chuyển về Idle một nhịp trước khi biến mất 
         ChangeAnimationState(NPC_IDLE);
         yield return new WaitForSeconds(0.1f);
 

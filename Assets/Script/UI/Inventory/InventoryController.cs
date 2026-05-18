@@ -38,97 +38,7 @@ public class InventoryController : MonoBehaviour
         RebuildItemCounts();
 
     }
-    /*
-    public bool AddItem(GameObject itemPrefab)
-    {
-        Item itemToAdd = itemPrefab.GetComponent<Item>();
-        if (itemToAdd == null) return false;
 
-        //Check if we have this item type in inventory
-        foreach (Transform slotTranform in inventoryPanel.transform)
-        {
-            Slot slot = slotTranform.GetComponent<Slot>();
-            if (slot != null && slot.currentItem != null)
-            {
-                Item existingItem = slot.currentItem.GetComponent<Item>();
-                if (existingItem != null && existingItem.ID == itemToAdd.ID)
-                {
-                    
-                        // Same item, stack them
-                        existingItem.AddToStack(itemToAdd.quantity);
-                        return true;
-                }
-            }
-        }
-
-        //Look for empty slot
-        foreach (Transform slotTranform in inventoryPanel.transform) 
-        { 
-            Slot slot = slotTranform.GetComponent<Slot>();
-            if (slot != null && slot.currentItem == null)
-            {
-                GameObject newItem = Instantiate(itemPrefab, slot.transform);
-                newItem.GetComponent<RectTransform>().anchoredPosition = Vector2.zero;
-                slot.currentItem = newItem;
-                return true;
-            }
-        }
-
-        Debug.Log("Invetory is full");
-        return false;
-    }
-
-
-        public bool AddItem(GameObject itemPrefab)
-    {
-        Item itemToAdd = itemPrefab.GetComponent<Item>();
-        if (itemToAdd == null) return false;
-
-        // Lấy số lượng thực tế của item muốn thêm (ví dụ item dưới đất có quantity = 2)
-        int amountToAdd = itemToAdd.quantity;
-
-        // 1. Tìm xem trong Inventory đã có Item này chưa để Stack
-        foreach (Transform slotTransform in inventoryPanel.transform)
-        {
-            Slot slot = slotTransform.GetComponent<Slot>();
-
-            if (slot != null && slot.currentItem != null)
-            {
-                Item existingItem = slot.currentItem.GetComponent<Item>();
-
-                if (existingItem != null && existingItem.ID == itemToAdd.ID)
-                {
-                    // TĂNG SỐ LƯỢNG (Dùng số lượng thực tế của item nhặt được)
-                    existingItem.AddToStack(amountToAdd);
-
-                    // Nếu đây là item nhặt từ đất, hãy Destroy nó đi
-                    // Destroy(itemPrefab); 
-                    return true;
-                }
-            }
-        }
-
-        // 2. Nếu không stack được, tìm ô trống (Sửa logic của bạn một chút)
-        foreach (Transform slotTransform in inventoryPanel.transform)
-        {
-            Slot slot = slotTransform.GetComponent<Slot>();
-            if (slot != null && slot.currentItem == null)
-            {
-                GameObject newItem = Instantiate(itemPrefab, slot.transform);
-                newItem.GetComponent<RectTransform>().anchoredPosition = Vector2.zero;
-                slot.currentItem = newItem;
-
-                // QUAN TRỌNG: Đảm bảo item mới sinh ra có số lượng bằng item gốc
-                Item newItemComponent = newItem.GetComponent<Item>();
-                newItemComponent.quantity = amountToAdd;
-                newItemComponent.UpdateQuantityDisplay();
-
-                return true;
-            }
-        }
-        return false;
-    }
-    */
 
     public void RebuildItemCounts()
     {
@@ -158,7 +68,7 @@ public class InventoryController : MonoBehaviour
 
         int amountToAdd = itemToAdd.quantity;
 
-        // 1. Tìm để Stack
+        // Tìm để Stack
         foreach (Transform slotTransform in inventoryPanel.transform)
         {
             Slot slot = slotTransform.GetComponent<Slot>();
@@ -175,13 +85,12 @@ public class InventoryController : MonoBehaviour
             }
         }
 
-        // 2. Tìm ô trống và TỰ ĐỘNG lấy Prefab chuẩn từ Dictionary
+        // Tìm ô trống và TỰ ĐỘNG lấy Prefab chuẩn từ Dictionary
         foreach (Transform slotTransform in inventoryPanel.transform)
         {
             Slot slot = slotTransform.GetComponent<Slot>();
             if (slot != null && slot.currentItem == null)
             {
-                // TỰ ĐỘNG NHẬN DIỆN PREFAB DỰA TRÊN ID CỦA VẬT PHẨM ĐANG NHẶT
                 GameObject correctPrefab = itemDictionary.GetItemPrefab(itemToAdd.ID);
 
                 if (correctPrefab != null)
@@ -405,14 +314,11 @@ public class InventoryController : MonoBehaviour
                     Item item = slot.currentItem.GetComponent<Item>();
                     if (item != null && item.ID == itemID)
                     {
-                        // Tính số lượng thực tế có thể trừ trong slot này
                         int canRemove = Mathf.Min(amountToRemove, item.quantity);
 
-                        // Gọi hàm trừ stack (đảm bảo hàm này trừ số lượng và update UI của Item đó)
                         item.RemoveFromStack(canRemove);
                         amountToRemove -= canRemove;
 
-                        // Nếu slot đó hết sạch đồ thì xóa Object
                         if (item.quantity <= 0)
                         {
                             Destroy(slot.currentItem);
@@ -427,28 +333,4 @@ public class InventoryController : MonoBehaviour
         RebuildItemCounts();
     }
     
-    /*
-    public void RemoveItemsFromInventory(int itemID, int amountToRemove)
-    {
-        foreach (Transform slotTranform in inventoryPanel.transform)
-        {
-            if (amountToRemove <= 0) break;
-
-            Slot slot = slotTranform.GetComponent<Slot>();
-            if (slot?.currentItem?.GetComponent<Item>() is Item item && item.ID == itemID)
-            {
-                int removed = Mathf.Min(amountToRemove, item.quantity);
-                item.RemoveFromStack(removed);
-                amountToRemove -= removed;
-
-                if (item.quantity == 0)
-                {
-                    Destroy(slot.currentItem);
-                    slot.currentItem = null;
-                }
-            }
-        }
-
-        RebuildItemCounts();
-    }*/
 }

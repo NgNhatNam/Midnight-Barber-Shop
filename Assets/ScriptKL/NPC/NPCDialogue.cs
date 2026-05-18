@@ -55,12 +55,12 @@ public class ConditionalDialogueGroup
     public Season requiredSeason;
     public int startHour = 0;
     public int endHour = 23;
-    public int startDate = 1; // Ngày bắt đầu trong tháng (1-28)
+    public int startDate = 1;
 
     [Header("Quest Content")]
     public Quest quest;
     public Quest prerequisiteQuest;
-    public int questDurationHours = 24; // Thời hạn hoàn thành
+    public int questDurationHours = 24; 
 
     [Header("Dialogue Content")]
     public List<DialogueLine> dialogueLines;

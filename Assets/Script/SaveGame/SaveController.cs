@@ -1,4 +1,4 @@
-﻿using DPUtils.System.DateTime;
+using DPUtils.System.DateTime;
 using NUnit.Framework;
 using NUnit.Framework.Interfaces;
 using System.Collections;
@@ -38,7 +38,9 @@ public class SaveController : MonoBehaviour
         if (PendingReset)
         {
             PendingReset = false;
+            IsLoadingGame = true;
             PerformResetAfterLoad();
+            IsLoadingGame = false;
 
             await Task.Yield();
 
@@ -51,7 +53,7 @@ public class SaveController : MonoBehaviour
         if (GameStartupMode.IsNewGame)
         {
             GameStartupMode.IsNewGame = false;
-            await ResetGame();
+            await ResetGame(false);
             return;
         }
 
@@ -224,27 +226,7 @@ public class SaveController : MonoBehaviour
         }
     }
 
-    /*
-    public async void LoadGameButton()
-    {
-        if (File.Exists(saveLocation))
-        {
-            
-            if (ScreenFader.Instance != null) await ScreenFader.Instance.FadeOut();
 
-            SaveData saveData = JsonUtility.FromJson<SaveData>(File.ReadAllText(saveLocation));
-            
-            ExecuteLoad(saveData);
-
-            await ScreenFader.Instance.FadeIn();
-        }
-        else
-        {
-            SaveGame();
-        }
-    }
-    
-    */
     public async void LoadGameButton()
     {
         await LoadGame();
@@ -418,9 +400,9 @@ public class SaveController : MonoBehaviour
         Debug.Log("Reset hoàn tất sau khi load scene!");
     }
 
-    async Task ResetGame()
+    async Task ResetGame(bool reloadScene = true)
     {
-        if (ScreenFader.Instance != null) await ScreenFader.Instance.FadeOut();
+        if (reloadScene && ScreenFader.Instance != null) await ScreenFader.Instance.FadeOut();
 
         if (File.Exists(saveLocation))
         {
@@ -428,11 +410,21 @@ public class SaveController : MonoBehaviour
             Debug.Log("Save deleted!");
         }
 
-        PendingReset = true;  
-
         Time.timeScale = 1f;
-        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
 
+        if (reloadScene)
+        {
+            PendingReset = true;  
+            SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+        }
+        else
+        {
+            IsLoadingGame = true;
+            PerformResetAfterLoad();
+            IsLoadingGame = false;
+            await Task.Yield();
+            if (ScreenFader.Instance != null) await ScreenFader.Instance.FadeIn();
+        }
     }
 
     public void OnClickResetButton()
@@ -450,100 +442,5 @@ public class SaveController : MonoBehaviour
     {
         Time.timeScale = 0f;
     }
-    /*
-  public void ResetGame()
-  {
-      // Xóa file save
-      if (File.Exists(saveLocation))
-      {
-          File.Delete(saveLocation);
-          Debug.Log("Save data has been deleted!");
-      }
-
-      var confiner = FindAnyObjectByType<Unity.Cinemachine.CinemachineConfiner2D>();
-      confiner.BoundingShape2D = GameObject.Find("Village_City").GetComponent<BoxCollider2D>();
-
-      // Đảm bảo game không bị pause
-      Time.timeScale = 1f;
-
-      // Reload lại scene hiện tại
-      SceneManager.LoadScene(SceneManager.GetActiveScene().name);
-
-      // Đặt lại thời gian game về mặc định
-      var resetTime = new DPUtils.System.DateTime.DateTime(
-          date: 1,
-          season: 0,
-          year: 1,
-          hour: 6,
-          minutes: 0
-      );
-      SetCurrentGameTime(resetTime);
-      Debug.Log("Game sẽ quay reset vào Ngày 1, Mùa Xuân, Năm 1, 06:00 AM");
-      SaveGame();
-      Debug.Log("Game reset: reloading scene...");
-  }
-
-
-  public void ResetGame()
-  {
-      // Kiểm tra file lưu
-      if (File.Exists(saveLocation))
-      {
-          File.Delete(saveLocation);
-          Debug.Log("🧹 Save data has been deleted!");
-      }
-
-      // Đưa player về vị trí mặc định (tuỳ bạn chỉnh)
-      GameObject player = GameObject.FindGameObjectWithTag("Player");
-      if (player != null)
-      {
-          player.transform.position = new Vector3(-1f, 6f, 0f);
-      }
-
-
-      var confiner = FindAnyObjectByType<Unity.Cinemachine.CinemachineConfiner2D>();
-      if (confiner != null)
-          confiner.BoundingShape2D = GameObject.Find("City_Shop").GetComponent<BoxCollider2D>();
-
-
-
-      // Xoá dữ liệu inventory
-      if (inventoryController != null)
-      {
-          inventoryController.ClearInventory(); // ⚠️ Cần có hàm này trong InventoryController
-      } 
-
-      // Đặt lại ánh sáng mặc định
-      if (globalLight != null)
-      {
-          globalLight.intensity = 1f;
-      }
-
-      // Đặt lại thời gian game về mặc định
-      var resetTime = new DPUtils.System.DateTime.DateTime(
-          date: 1,
-          season: 0,
-          year: 1,
-          hour: 6,
-          minutes: 0
-      );
-      SetCurrentGameTime(resetTime);
-      Debug.Log("⏰ Game time reset to Day 1, Spring, Year 1, 06:00 AM");
-
-      // Đặt lại Player Health
-      if (playerHealth != null)
-      {
-          playerHealth.HealFull();
-          playerHealth.HealFullMN();
-          playerHealth.SetGold(0);
-          playerHealth.SetStress(playerHealth.MaxStress);
-      }
-
-      // 💾 6. Lưu lại để tạo file mới từ đầu
-      SaveGame();
-
-      Debug.Log("✅ Game reset complete!");
-  }
-*/
-
+   
 }
